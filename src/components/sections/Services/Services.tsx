@@ -36,7 +36,7 @@ export default function Services({ preview = false }: ServicesProps) {
             <Reveal as="li" key={service.id} delay={60 * index} className={styles.row}>
               <span className={styles.index}>{String(index + 1).padStart(2, "0")}</span>
               <div className={styles.body}>
-                <h3>{service.title}</h3>
+                <h3 data-text={service.title}>{service.title}</h3>
                 <p>{service.description}</p>
                 {!preview && (
                 <ul className={styles.includes}>

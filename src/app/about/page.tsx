@@ -14,7 +14,7 @@ export default function AboutPage() {
 			eyebrow='About'
 			title={
 				<>
-					Hi, I&apos;m <em>Oskar!</em>
+					Hi, I&apos;m <em>Oskar</em>!
 				</>
 			}
 			lede={OSKAR_INTRO}
