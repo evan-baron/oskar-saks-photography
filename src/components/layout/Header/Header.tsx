@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useActiveSection } from "@/hooks/useActiveSection";
+import { CATEGORIES } from "@/data/photos";
 import { INSTAGRAM_HANDLE, INSTAGRAM_URL, NAV_LINKS, PHOTOGRAPHER } from "@/lib/siteConfig";
 import styles from "./header.module.scss";
 
@@ -45,7 +46,7 @@ export default function Header() {
     >
       <div className={styles.backdrop} aria-hidden="true" />
       <div className={styles.bar}>
-        <Link href="#home" className={styles.brand} onClick={closeMenu} aria-label={`${PHOTOGRAPHER}, back to top`}>
+        <Link href="/" className={styles.brand} onClick={closeMenu} aria-label={`${PHOTOGRAPHER}, back to top`}>
           <Image
             src="/images/logo.webp"
             alt={`${PHOTOGRAPHER} Photo`}
@@ -59,15 +60,26 @@ export default function Header() {
 
         <nav className={styles.desktopNav} aria-label="Primary">
           <ul>
-            {NAV_LINKS.map(({ id, label }) => (
-              <li key={id}>
+            {NAV_LINKS.map(({ id, label, href }) => (
+              <li key={id} className={id === "gallery" ? styles.hasMenu : undefined}>
                 <Link
-                  href={`#${id}`}
+                  href={href}
                   className={`${styles.link} ${active === id ? styles.active : ""}`}
-                  aria-current={active === id ? "location" : undefined}
+                  aria-current={active === id ? "page" : undefined}
                 >
                   {label}
                 </Link>
+                {id === "gallery" && (
+                  <ul className={styles.dropdown}>
+                    {CATEGORIES.map((category) => (
+                      <li key={category.slug}>
+                        <Link href={`/gallery/${category.slug}`} className={styles.dropLink}>
+                          {category.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>
@@ -92,16 +104,27 @@ export default function Header() {
       <div id="mobile-menu" className={styles.overlay} inert={!menuOpen}>
         <nav aria-label="Mobile">
           <ul>
-            {NAV_LINKS.map(({ id, label }, index) => (
+            {NAV_LINKS.map(({ id, label, href }, index) => (
               <li key={id} style={{ transitionDelay: menuOpen ? `${120 + index * 55}ms` : "0ms" }}>
                 <Link
-                  href={`#${id}`}
+                  href={href}
                   className={`${styles.overlayLink} ${active === id ? styles.active : ""}`}
                   onClick={closeMenu}
                 >
                   <span className={styles.index}>{String(index + 1).padStart(2, "0")}</span>
                   <span>{label}</span>
                 </Link>
+                {id === "gallery" && (
+                  <ul className={styles.subLinks}>
+                    {CATEGORIES.map((category) => (
+                      <li key={category.slug}>
+                        <Link href={`/gallery/${category.slug}`} onClick={closeMenu}>
+                          {category.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

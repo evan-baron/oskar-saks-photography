@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { HERO_PHOTO, PHOTO_CATEGORIES } from "@/data/photos";
+import { HERO_PHOTO, CATEGORIES } from "@/data/photos";
 import { LOCATION, SITE_TAGLINE } from "@/lib/siteConfig";
 import Snowfall from "./Snowfall";
 import styles from "./hero.module.scss";
@@ -49,8 +49,8 @@ export default function Hero() {
 
       <div className={styles.meta}>
         <ul className={styles.categories} aria-label="Specialties">
-          {PHOTO_CATEGORIES.map((category) => (
-            <li key={category}>{category}</li>
+          {CATEGORIES.map((category) => (
+            <li key={category.slug}>{category.label}</li>
           ))}
         </ul>
         <Link href="#about" className={styles.scroll} aria-label="Scroll to About">

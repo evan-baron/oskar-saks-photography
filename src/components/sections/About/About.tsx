@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import Reveal from "@/components/ui/Reveal/Reveal";
 import { ABOUT_PARAGRAPHS } from "@/data/about";
 import { ABOUT_PHOTO } from "@/data/photos";
@@ -6,7 +7,11 @@ import styles from "./about.module.scss";
 
 export default function About() {
   return (
-    <section id="about" className={styles.about} aria-labelledby="about-title">
+    <section
+      id="about"
+      className={styles.about}
+      aria-labelledby="about-title"
+    >
       <div className={styles.inner}>
         <Reveal className={styles.media}>
           <div className={styles.portrait}>
@@ -40,6 +45,11 @@ export default function About() {
               {paragraph}
             </Reveal>
           ))}
+          <Reveal delay={260} className={styles.actions}>
+            <Link href="/about" className={styles.secondary}>
+              More about Oskar <span aria-hidden="true">→</span>
+            </Link>
+          </Reveal>
         </div>
       </div>
     </section>

@@ -9,7 +9,7 @@ import styles from "./contact.module.scss";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-const EMPTY_FORM = { name: "", email: "", topic: "portraits", date: "", message: "", website: "" };
+const EMPTY_FORM = { name: "", email: "", topic: "families", date: "", message: "", website: "" };
 
 export default function Contact() {
   const [form, setForm] = useState(EMPTY_FORM);

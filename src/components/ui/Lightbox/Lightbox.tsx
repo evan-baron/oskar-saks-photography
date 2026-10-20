@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
-import type { Photo } from "@/data/photos";
+import { getCategory, type Photo } from "@/data/photos";
 import styles from "./lightbox.module.scss";
 
 type LightboxProps = {
@@ -55,7 +55,7 @@ export default function Lightbox({ photos, index, onClose, onChange }: LightboxP
       className={styles.lightbox}
       role="dialog"
       aria-modal="true"
-      aria-label={`${photo.title}, photograph ${index + 1} of ${total}`}
+      aria-label={`${photo.title ?? photo.alt}, photograph ${index + 1} of ${total}`}
       onTouchStart={(event) => {
         const touch = event.touches[0];
         if (touch) touchStart.current = { x: touch.clientX, y: touch.clientY };
@@ -100,8 +100,8 @@ export default function Lightbox({ photos, index, onClose, onChange }: LightboxP
           <span aria-hidden="true">←</span>
         </button>
         <div className={styles.caption}>
-          <p className={styles.title}>{photo.title}</p>
-          <p className={styles.category}>{photo.category}</p>
+          {photo.title && <p className={styles.title}>{photo.title}</p>}
+          <p className={styles.category}>{getCategory(photo.category)?.label}</p>
         </div>
         <button type="button" className={styles.arrow} onClick={() => go(1)} aria-label="Next photograph">
           <span aria-hidden="true">→</span>

@@ -1,29 +1,44 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { NAV_LINKS, type SectionId } from "@/lib/siteConfig";
+import { usePathname } from "next/navigation";
+import type { SectionId } from "@/lib/siteConfig";
+
+const OBSERVED: SectionId[] = ["store", "contact"];
+
+function routeSection(pathname: string): SectionId {
+  if (pathname.startsWith("/about")) return "about";
+  if (pathname.startsWith("/gallery")) return "gallery";
+  if (pathname.startsWith("/services")) return "services";
+  return "home";
+}
 
 export function useActiveSection() {
-  const [active, setActive] = useState<SectionId>("home");
+  const pathname = usePathname();
+  const [observed, setObserved] = useState<SectionId | null>(null);
 
   useEffect(() => {
-    const nodes = NAV_LINKS.map(({ id }) => document.getElementById(id)).filter(
+    const nodes = OBSERVED.map((id) => document.getElementById(id)).filter(
       (node): node is HTMLElement => node !== null,
     );
-    if (!nodes.length) return;
+    const inView = new Set<string>();
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActive(visible.target.id as SectionId);
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) inView.add(entry.target.id);
+          else inView.delete(entry.target.id);
+        });
+        const current = OBSERVED.slice()
+          .reverse()
+          .find((id) => inView.has(id));
+        setObserved(current ?? null);
       },
-      { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 1] },
+      { rootMargin: "-40% 0px -50% 0px" },
     );
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
-  return active;
+  return observed ?? routeSection(pathname);
 }

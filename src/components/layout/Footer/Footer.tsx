@@ -18,9 +18,9 @@ export default function Footer() {
         <div className={styles.row}>
           <nav aria-label="Footer">
             <ul>
-              {NAV_LINKS.map(({ id, label }) => (
+              {NAV_LINKS.map(({ id, label, href }) => (
                 <li key={id}>
-                  <Link href={`#${id}`}>{label}</Link>
+                  <Link href={href}>{label}</Link>
                 </li>
               ))}
             </ul>

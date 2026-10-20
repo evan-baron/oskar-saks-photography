@@ -1,0 +1,50 @@
+@use '@/styles/mixins' as *;
+
+.body {
+	@include container;
+	padding-bottom: var(--section-space);
+}
+
+.pager {
+	@include container;
+	display: grid;
+	gap: 1rem;
+	padding-bottom: var(--section-space);
+
+	@include from($bp-md) {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.pagerLink {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	padding: 1.5rem 1.75rem;
+	background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+	border: 1px solid var(--color-line);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-soft);
+	transition:
+		box-shadow 0.5s ease,
+		transform 0.5s var(--ease-out);
+
+	@include hover {
+		box-shadow: var(--shadow-lift);
+		transform: translateY(-3px);
+	}
+
+	small {
+		font-family: var(--font-mono);
+		font-size: 0.65rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: var(--color-text-dim);
+	}
+
+	span {
+		font-family: var(--font-display);
+		font-size: 1.75rem;
+		line-height: 1.2;
+	}
+}

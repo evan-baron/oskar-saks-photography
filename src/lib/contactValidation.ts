@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 export const CONTACT_TOPICS = [
-  { value: "portraits", label: "Portraits" },
-  { value: "weddings", label: "Weddings & Events" },
-  { value: "editorial", label: "Editorial & Brand" },
+  { value: "families", label: "Family Sessions" },
+  { value: "couples", label: "Couples & Engagements" },
+  { value: "events", label: "Events & Weddings" },
   { value: "prints", label: "Prints & Custom Work" },
   { value: "other", label: "Something else" },
 ] as const;

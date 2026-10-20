@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Mono, Young_Serif, Schibsted_Grotesk } from "next/font/google";
 import Header from "@/components/layout/Header/Header";
+import Contact from "@/components/sections/Contact/Contact";
 import Footer from "@/components/layout/Footer/Footer";
 import {
   PHOTOGRAPHER,
@@ -58,11 +59,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${youngSerif.variable} ${schibsted.variable} ${dmMono.variable}`}
     >
       <body>
         <Header />
         <main>{children}</main>
+        <Contact />
         <Footer />
       </body>
     </html>

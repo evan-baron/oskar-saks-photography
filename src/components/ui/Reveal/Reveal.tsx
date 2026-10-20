@@ -9,6 +9,7 @@ type RevealProps = {
   as?: ElementType;
   delay?: number;
   className?: string;
+  style?: CSSProperties;
 };
 
 export default function Reveal({
@@ -16,9 +17,10 @@ export default function Reveal({
   as: Tag = "div",
   delay = 0,
   className = "",
+  style: extraStyle,
 }: RevealProps) {
   const { ref, inView } = useInView<HTMLElement>();
-  const style = { "--reveal-delay": `${delay}ms` } as CSSProperties;
+  const style = { ...extraStyle, "--reveal-delay": `${delay}ms` } as CSSProperties;
 
   return (
     <Tag
