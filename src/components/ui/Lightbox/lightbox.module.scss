@@ -106,6 +106,14 @@
 	animation: swap 0.55s var(--ease-out);
 }
 
+.fromRight {
+	--swap-from: 2.5rem;
+}
+
+.fromLeft {
+	--swap-from: -2.5rem;
+}
+
 .image {
 	object-fit: contain;
 	border-radius: var(--radius-sm);
@@ -131,7 +139,7 @@
 
 	.category {
 		color: var(--color-accent);
-		font-size: 0.65rem;
+		font-size: 0.7rem;
 	}
 }
 
@@ -175,6 +183,6 @@
 @keyframes swap {
 	from {
 		opacity: 0;
-		transform: scale(0.985);
+		transform: translateX(var(--swap-from, 0)) scale(0.985);
 	}
 }

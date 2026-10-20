@@ -11,6 +11,11 @@
 		transform: none;
 	}
 
+	@media (scripting: none) {
+		opacity: 1;
+		transform: none;
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		opacity: 1;
 		transform: none;

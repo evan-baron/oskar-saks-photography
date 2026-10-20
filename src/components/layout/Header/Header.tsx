@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useActiveSection } from "@/hooks/useActiveSection";
@@ -10,11 +10,24 @@ import styles from "./header.module.scss";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [dropdownDismissed, setDropdownDismissed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const lastY = useRef(0);
   const active = useActiveSection();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 24);
+      setDropdownDismissed(true);
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement && focused.closest("[data-gallery-menu]")) focused.blur();
+      if (Math.abs(y - lastY.current) > 8) {
+        setHidden(y > 400 && y > lastY.current);
+        lastY.current = y;
+      }
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -42,7 +55,8 @@ export default function Header() {
 
   return (
     <header
-      className={`${styles.header} ${scrolled ? styles.scrolled : ""} ${menuOpen ? styles.open : ""}`}
+      className={`${styles.header} ${scrolled ? styles.scrolled : ""} ${menuOpen ? styles.open : ""} ${hidden && !menuOpen ? styles.hidden : ""}`}
+      onFocusCapture={() => setHidden(false)}
     >
       <div className={styles.backdrop} aria-hidden="true" />
       <div className={styles.bar}>
@@ -61,7 +75,17 @@ export default function Header() {
         <nav className={styles.desktopNav} aria-label="Primary">
           <ul>
             {NAV_LINKS.map(({ id, label, href }) => (
-              <li key={id} className={id === "gallery" ? styles.hasMenu : undefined}>
+              <li
+                key={id}
+                className={
+                  id === "gallery"
+                    ? `${styles.hasMenu} ${dropdownDismissed ? styles.menuDismissed : ""}`
+                    : undefined
+                }
+                data-gallery-menu={id === "gallery" ? "" : undefined}
+                onPointerEnter={id === "gallery" ? () => setDropdownDismissed(false) : undefined}
+                onFocus={id === "gallery" ? () => setDropdownDismissed(false) : undefined}
+              >
                 <Link
                   href={href}
                   className={`${styles.link} ${active === id ? styles.active : ""}`}

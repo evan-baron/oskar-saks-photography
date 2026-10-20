@@ -113,7 +113,42 @@ button {
 
 ::selection {
 	background: var(--color-accent);
-	color: var(--color-text);
+	color: hsl(0, 0%, 100%);
+	-webkit-text-fill-color: hsl(0, 0%, 100%);
+}
+
+// Hairline reading-progress bar, driven by scroll with no JS (progressive enhancement).
+@supports (animation-timeline: scroll()) {
+	body::after {
+		content: '';
+		position: fixed;
+		inset: 0 0 auto 0;
+		z-index: 200;
+		height: 2px;
+		background: var(--gradient-accent);
+		transform: scaleX(0);
+		transform-origin: left;
+		pointer-events: none;
+		animation: progress linear both;
+		animation-timeline: scroll(root);
+
+		@media (prefers-reduced-motion: reduce) {
+			display: none;
+		}
+	}
+}
+
+@keyframes progress {
+	to {
+		transform: scaleX(1);
+	}
+}
+
+// Route changes: a soft crossfade with a hint of lift instead of a hard cut.
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0.45s;
+	animation-timing-function: var(--ease-out);
 }
 
 :focus-visible {
@@ -143,4 +178,10 @@ button {
 		transition-duration: 0.01ms !important;
 		transition-delay: 0s !important;
 	}
+}
+
+// Gallery thumbnail <-> lightbox shared-element morph.
+::view-transition-group(.morph) {
+	animation-duration: 0.55s;
+	animation-timing-function: var(--ease-out);
 }

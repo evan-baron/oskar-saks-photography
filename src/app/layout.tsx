@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import type { Metadata, Viewport } from "next";
 import { DM_Mono, Young_Serif, Schibsted_Grotesk } from "next/font/google";
 import Header from "@/components/layout/Header/Header";
@@ -64,7 +65,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body>
         <Header />
-        <main>{children}</main>
+        <ViewTransition>
+          <main>{children}</main>
+        </ViewTransition>
         <Contact />
         <Footer />
       </body>

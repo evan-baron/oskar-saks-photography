@@ -127,7 +127,7 @@
 
 .number {
 	font-family: var(--font-mono);
-	font-size: 0.65rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.2em;
 	color: hsla(0, 0%, 100%, 0.85);
 	transform: translateY(-0.4rem);
@@ -155,6 +155,42 @@
 	}
 }
 
+.cursor {
+	position: absolute;
+	left: var(--mx, 50%);
+	top: var(--my, 50%);
+	z-index: 2;
+	display: none;
+	padding: 0.6rem 1rem;
+	font-family: var(--font-mono);
+	font-size: 0.7rem;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: hsl(0, 0%, 100%);
+	background: hsla(218, 45%, 14%, 0.35);
+	border: 1px solid hsla(0, 0%, 100%, 0.35);
+	border-radius: 999px;
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	opacity: 0;
+	pointer-events: none;
+	transform: translate(-50%, -50%) scale(0.7);
+	transition:
+		opacity 0.3s ease,
+		transform 0.4s var(--ease-out);
+
+	@media (hover: hover) and (pointer: fine) {
+		display: block;
+	}
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.tile:hover .cursor {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1);
+	}
+}
+
 .name {
 	color: hsl(0, 0%, 100%);
 	font-family: var(--font-display);
@@ -165,7 +201,7 @@
 
 .cat {
 	font-family: var(--font-mono);
-	font-size: 0.62rem;
+	font-size: 0.7rem;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
 	color: hsla(0, 0%, 100%, 0.78);

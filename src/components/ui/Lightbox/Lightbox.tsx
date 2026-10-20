@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  ViewTransition,
+} from "react";
 import Image from "next/image";
 import { getCategory, type Photo } from "@/data/photos";
 import styles from "./lightbox.module.scss";
@@ -8,29 +14,44 @@ import styles from "./lightbox.module.scss";
 type LightboxProps = {
   photos: Photo[];
   index: number;
+  transitionPrefix: string;
   onClose: () => void;
   onChange: (index: number) => void;
 };
 
 const SWIPE_THRESHOLD = 50;
 
-export default function Lightbox({ photos, index, onClose, onChange }: LightboxProps) {
+export default function Lightbox({
+  photos,
+  index,
+  transitionPrefix,
+  onClose,
+  onChange,
+}: LightboxProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const [direction, setDirection] = useState<1 | -1>(1);
   const total = photos.length;
   const photo = photos[index];
 
   const go = useCallback(
-    (direction: 1 | -1) => onChange((index + direction + total) % total),
+    (step: 1 | -1) => {
+      setDirection(step);
+      onChange((index + step + total) % total);
+    },
     [index, total, onChange],
   );
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = "hidden";
+    document.body.style.paddingRight = scrollbar ? `${scrollbar}px` : "";
     closeRef.current?.focus();
     return () => {
       document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
       previous?.focus?.();
     };
   }, []);
@@ -40,6 +61,20 @@ export default function Lightbox({ photos, index, onClose, onChange }: LightboxP
       if (event.key === "Escape") onClose();
       if (event.key === "ArrowRight") go(1);
       if (event.key === "ArrowLeft") go(-1);
+      if (event.key === "Tab") {
+        const focusable =
+          rootRef.current?.querySelectorAll<HTMLElement>("button");
+        if (!focusable?.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -52,6 +87,7 @@ export default function Lightbox({ photos, index, onClose, onChange }: LightboxP
 
   return (
     <div
+      ref={rootRef}
       className={styles.lightbox}
       role="dialog"
       aria-modal="true"
@@ -67,7 +103,8 @@ export default function Lightbox({ photos, index, onClose, onChange }: LightboxP
         if (!start || !touch) return;
         const dx = touch.clientX - start.x;
         const dy = touch.clientY - start.y;
-        if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) go(dx < 0 ? 1 : -1);
+        if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy))
+          go(dx < 0 ? 1 : -1);
       }}
     >
       <div className={styles.top}>
@@ -76,34 +113,61 @@ export default function Lightbox({ photos, index, onClose, onChange }: LightboxP
           <span className={styles.sep}>/</span>
           <span>{String(total).padStart(2, "0")}</span>
         </p>
-        <button ref={closeRef} type="button" className={styles.close} onClick={onClose}>
+        <button
+          ref={closeRef}
+          type="button"
+          className={styles.close}
+          onClick={onClose}
+        >
           <span>Close</span>
           <span className={styles.x} aria-hidden="true" />
         </button>
       </div>
 
       <div className={styles.stage} onClick={onClose}>
-        <div key={photo.id} className={styles.figure} onClick={(event) => event.stopPropagation()}>
-          <Image
-            src={photo.src}
-            alt={photo.alt}
-            fill
-            sizes="100vw"
-            quality={90}
-            className={styles.image}
-          />
-        </div>
+        <ViewTransition
+          key={photo.id}
+          name={`${transitionPrefix}-${photo.id}`}
+          share="morph"
+          default="none"
+        >
+          <div
+            className={`${styles.figure} ${direction === 1 ? styles.fromRight : styles.fromLeft}`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              fill
+              sizes="100vw"
+              quality={90}
+              className={styles.image}
+            />
+          </div>
+        </ViewTransition>
       </div>
 
       <div className={styles.bottom}>
-        <button type="button" className={styles.arrow} onClick={() => go(-1)} aria-label="Previous photograph">
+        <button
+          type="button"
+          className={styles.arrow}
+          onClick={() => go(-1)}
+          aria-label="Previous photograph"
+        >
           <span aria-hidden="true">←</span>
         </button>
         <div className={styles.caption}>
           {photo.title && <p className={styles.title}>{photo.title}</p>}
-          <p className={styles.category}>{getCategory(photo.category)?.label}</p>
+          <p className={styles.category}>
+            {getCategory(photo.category)?.label}
+          </p>
         </div>
-        <button type="button" className={styles.arrow} onClick={() => go(1)} aria-label="Next photograph">
+        <button
+          type="button"
+          className={styles.arrow}
+          onClick={() => go(1)}
+          aria-label="Next photograph"
+        >
           <span aria-hidden="true">→</span>
         </button>
       </div>
@@ -112,7 +176,14 @@ export default function Lightbox({ photos, index, onClose, onChange }: LightboxP
         {[prev, next].map(
           (neighbor) =>
             neighbor && (
-              <Image key={neighbor.id} src={neighbor.src} alt="" fill sizes="100vw" quality={90} />
+              <Image
+                key={neighbor.id}
+                src={neighbor.src}
+                alt=""
+                fill
+                sizes="100vw"
+                quality={90}
+              />
             ),
         )}
       </div>

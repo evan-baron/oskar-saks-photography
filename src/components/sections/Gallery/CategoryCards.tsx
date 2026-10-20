@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import Image from "next/image";
+import FadeImage from "@/components/ui/FadeImage/FadeImage";
 import Link from "next/link";
 import Reveal from "@/components/ui/Reveal/Reveal";
 import { CATEGORIES, getPhotosByCategory } from "@/data/photos";
@@ -15,7 +15,7 @@ export default function CategoryCards() {
         return (
           <Reveal as="li" key={category.slug} delay={index * 110} className={styles.item}>
             <Link href={`/gallery/${category.slug}`} className={styles.card}>
-              <Image
+              <FadeImage
                 src={cover.src}
                 alt=""
                 fill
