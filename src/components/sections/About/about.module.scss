@@ -71,7 +71,7 @@
 .title {
 	@include display-title;
 	font-size: clamp(2.15rem, 7.5vw, 3.9rem);
-	line-height: 1;
+	line-height: 1.2;
 	margin-bottom: 0.5rem;
 }
 

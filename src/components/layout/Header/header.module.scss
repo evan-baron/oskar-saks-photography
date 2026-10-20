@@ -254,8 +254,9 @@
 		min-width: 1.5rem;
 	}
 
-	&.active {
-		color: var(--color-accent);
+	&.active > span:last-child {
+		padding-right: 0.06em;
+		@include gradient-text;
 	}
 }
 

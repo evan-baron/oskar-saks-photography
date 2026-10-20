@@ -50,7 +50,9 @@
 		background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-accent-soft) 60%, transparent) 50%, transparent);
 
 		.body h3 {
-			color: var(--color-accent);
+			display: inline-block;
+			padding-bottom: 0.1em;
+			@include gradient-text;
 		}
 	}
 }
@@ -68,7 +70,7 @@
 		font-family: var(--font-display);
 		font-weight: 400;
 		font-size: clamp(1.75rem, 6.5vw, 2.9rem);
-		line-height: 1;
+		line-height: 1.2;
 		letter-spacing: -0.02em;
 		transition: color 0.4s ease;
 	}
