@@ -6,7 +6,9 @@
 	z-index: 300;
 	display: flex;
 	flex-direction: column;
-	background: hsla(30, 8%, 4%, 0.97);
+	background: color-mix(in srgb, var(--color-bg) 93%, transparent);
+	-webkit-backdrop-filter: blur(18px);
+	backdrop-filter: blur(18px);
 	animation: open 0.45s var(--ease-out);
 	touch-action: pan-y;
 }
@@ -39,7 +41,7 @@
 	gap: 0.6rem;
 
 	.sep {
-		color: var(--color-ember);
+		color: var(--color-accent);
 	}
 }
 
@@ -82,7 +84,7 @@
 	}
 
 	@include hover {
-		color: var(--color-ember);
+		color: var(--color-accent);
 	}
 }
 
@@ -106,6 +108,7 @@
 
 .image {
 	object-fit: contain;
+	border-radius: var(--radius-sm);
 }
 
 .caption {
@@ -127,7 +130,7 @@
 	}
 
 	.category {
-		color: var(--color-ember);
+		color: var(--color-accent);
 		font-size: 0.65rem;
 	}
 }
@@ -148,9 +151,9 @@
 		border-color 0.3s ease;
 
 	@include hover {
-		background: var(--color-paper);
-		border-color: var(--color-paper);
-		color: var(--color-ink);
+		background: var(--color-accent-soft);
+		border-color: transparent;
+		color: var(--color-accent-deep);
 	}
 }
 

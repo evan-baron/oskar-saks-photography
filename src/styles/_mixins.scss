@@ -36,7 +36,7 @@ $bp-xl: 1440px;
 	font-weight: 400;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
-	color: var(--color-ember);
+	color: var(--color-accent);
 	display: inline-flex;
 	align-items: center;
 	gap: 0.75rem;
@@ -54,12 +54,11 @@ $bp-xl: 1440px;
 	font-weight: 400;
 	line-height: 0.95;
 	letter-spacing: -0.02em;
-	font-size: clamp(2.75rem, 11vw, 6.5rem);
+	font-size: clamp(2.4rem, 9.5vw, 5.25rem);
 	text-wrap: balance;
 
 	em {
-		font-style: italic;
-		color: var(--color-ember);
+		color: var(--color-accent);
 	}
 }
 
@@ -69,47 +68,61 @@ $bp-xl: 1440px;
 	justify-content: center;
 	gap: 0.75rem;
 	min-height: 3.25rem;
-	padding: 0 1.75rem;
+	padding: 0 1.9rem;
 	font-family: var(--font-mono);
 	font-size: 0.75rem;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
-	color: var(--color-ink);
-	background: var(--color-paper);
-	border: 1px solid var(--color-paper);
+	color: hsl(0, 0%, 100%);
+	background: var(--gradient-accent);
+	background-size: 140% 100%;
+	background-position: 0% 0%;
+	border: none;
+	border-radius: 999px;
+	box-shadow: 0 0.9rem 1.75rem -0.9rem hsla(218, 80%, 40%, 0.55);
 	cursor: pointer;
 	transition:
-		background-color 0.3s ease,
-		color 0.3s ease,
-		border-color 0.3s ease;
+		background-position 0.6s ease,
+		box-shadow 0.5s ease,
+		transform 0.5s var(--ease-out);
 
 	@include hover {
-		background: var(--color-ember);
-		border-color: var(--color-ember);
-		color: var(--color-paper);
+		background-position: 100% 0%;
+		box-shadow: 0 1.1rem 2.25rem -0.9rem hsla(218, 80%, 40%, 0.7);
+		transform: translateY(-2px);
 	}
 
 	&:focus-visible {
-		outline: 2px solid var(--color-ember);
+		outline: 2px solid var(--color-accent);
 		outline-offset: 3px;
 	}
 
 	&:disabled {
-		opacity: 0.5;
+		opacity: 0.55;
 		cursor: not-allowed;
 	}
 }
 
 @mixin button-outline {
 	@include button-solid;
-	background: transparent;
-	color: var(--color-paper);
-	border-color: var(--color-line-strong);
+	color: var(--color-text);
+	background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+	border: 1px solid var(--color-line-strong);
+	box-shadow: none;
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	transition:
+		background-color 0.5s ease,
+		border-color 0.5s ease,
+		color 0.5s ease,
+		transform 0.5s var(--ease-out);
 
 	@include hover {
-		background: var(--color-paper);
-		border-color: var(--color-paper);
-		color: var(--color-ink);
+		background: var(--color-accent-soft);
+		border-color: transparent;
+		color: var(--color-accent-deep);
+		box-shadow: none;
+		transform: translateY(-2px);
 	}
 }
 

@@ -18,17 +18,17 @@ export const PHOTO_CATEGORIES: PhotoCategory[] = [
 ];
 
 export const HERO_PHOTO = {
-  src: "/images/hero.svg",
-  width: 2400,
-  height: 1600,
-  alt: "Placeholder hero photograph",
+  src: "/images/hero.webp",
+  width: 2000,
+  height: 1335,
+  alt: "A couple walking arm in arm through falling snow",
 };
 
 export const ABOUT_PHOTO = {
-  src: "/images/about.svg",
-  width: 1200,
-  height: 1500,
-  alt: "Placeholder portrait of Oskar Saks",
+  src: "/images/about.webp",
+  width: 2500,
+  height: 3333,
+  alt: "Oskar and Katya smiling together beneath a string-lit tree in golden evening light",
 };
 
 export const PHOTOS: Photo[] = [

@@ -2,8 +2,6 @@
 
 .contact {
 	@include section;
-	background: var(--color-ink);
-	border-top: 1px solid var(--color-line);
 }
 
 .inner {
@@ -35,13 +33,12 @@
 .lede {
 	max-width: 30rem;
 	font-size: 1.05rem;
-	color: hsla(40, 28%, 91%, 0.75);
+	color: color-mix(in srgb, var(--color-text) 75%, transparent);
 	text-wrap: pretty;
 }
 
 .details {
 	margin-top: 1rem;
-	border-top: 1px solid var(--color-line);
 
 	dl > div {
 		display: grid;
@@ -56,7 +53,7 @@
 		font-size: 0.68rem;
 		letter-spacing: 0.2em;
 		text-transform: uppercase;
-		color: var(--color-paper-dim);
+		color: var(--color-text-dim);
 		padding-top: 0.2rem;
 	}
 
@@ -100,7 +97,7 @@
 		font-size: 0.68rem;
 		letter-spacing: 0.2em;
 		text-transform: uppercase;
-		color: var(--color-paper-dim);
+		color: var(--color-text-dim);
 
 		span {
 			opacity: 0.6;
@@ -113,25 +110,27 @@
 	select {
 		width: 100%;
 		min-height: 3.25rem;
-		padding: 0.6rem 0;
+		padding: 0.75rem 1.15rem;
 		font: inherit;
 		font-size: 1.05rem;
-		color: var(--color-paper);
-		background: transparent;
-		border: none;
-		border-bottom: 1px solid var(--color-line-strong);
-		border-radius: 0;
+		color: var(--color-text);
+		background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+		border: 1px solid var(--color-line);
+		border-radius: var(--radius-sm);
+		box-shadow: 0 0.5rem 1.25rem -1rem hsla(218, 40%, 25%, 0.25);
 		outline: none;
 		appearance: none;
 		-webkit-appearance: none;
 		transition: border-color 0.3s ease;
 
 		&::placeholder {
-			color: hsla(40, 28%, 91%, 0.3);
+			color: color-mix(in srgb, var(--color-text) 30%, transparent);
 		}
 
 		&:focus {
-			border-bottom-color: var(--color-ember);
+			background: var(--color-surface);
+			border-color: var(--color-accent);
+			box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 16%, transparent);
 		}
 	}
 
@@ -148,23 +147,23 @@
 	&::after {
 		content: '';
 		position: absolute;
-		right: 0.25rem;
+		right: 1.15rem;
 		top: 50%;
 		width: 0.5rem;
 		height: 0.5rem;
-		border-right: 1px solid var(--color-paper);
-		border-bottom: 1px solid var(--color-paper);
+		border-right: 1px solid var(--color-text);
+		border-bottom: 1px solid var(--color-text);
 		transform: translateY(-70%) rotate(45deg);
 		pointer-events: none;
 	}
 
 	select {
-		padding-right: 1.5rem;
+		padding-right: 2.5rem;
 		cursor: pointer;
 
 		option {
-			background: var(--color-ink-raised);
-			color: var(--color-paper);
+			background: var(--color-bg-raised);
+			color: var(--color-text);
 		}
 	}
 }
@@ -180,9 +179,9 @@
 .error {
 	padding: 0.85rem 1rem;
 	font-size: 0.95rem;
-	color: var(--color-paper);
-	border-left: 2px solid var(--color-ember);
-	background: hsla(14, 82%, 58%, 0.1);
+	color: var(--color-text);
+	border-radius: var(--radius-sm);
+	background: var(--color-accent-soft);
 }
 
 .submit {
@@ -203,9 +202,10 @@
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 1.25rem;
-	padding: 2.5rem 0;
-	border-top: 1px solid var(--color-line-strong);
-	border-bottom: 1px solid var(--color-line-strong);
+	padding: 2.5rem 2rem;
+	border-radius: var(--radius-lg);
+	background: linear-gradient(160deg, var(--color-surface), var(--color-accent-soft));
+	box-shadow: var(--shadow-soft);
 
 	.successTitle {
 		@include display-title;
@@ -213,7 +213,7 @@
 	}
 
 	p {
-		color: hsla(40, 28%, 91%, 0.8);
+		color: color-mix(in srgb, var(--color-text) 80%, transparent);
 	}
 
 	.again {

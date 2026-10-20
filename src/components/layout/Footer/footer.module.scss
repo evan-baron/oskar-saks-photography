@@ -2,8 +2,7 @@
 
 .footer {
 	padding-block: 3rem 2rem;
-	background: var(--color-ink-raised);
-	border-top: 1px solid var(--color-line);
+	background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--color-bg-high) 85%, transparent));
 	overflow: hidden;
 }
 
@@ -16,7 +15,7 @@
 
 .mark {
 	font-family: var(--font-display);
-	font-size: clamp(4rem, 19vw, 15rem);
+	font-size: clamp(3.5rem, 16vw, 12rem);
 	line-height: 0.85;
 	letter-spacing: -0.04em;
 	color: transparent;
@@ -48,20 +47,19 @@
 		font-size: 0.7rem;
 		letter-spacing: 0.18em;
 		text-transform: uppercase;
-		color: var(--color-paper-dim);
+		color: var(--color-text-dim);
 		padding-block: 0.4rem;
 		display: inline-block;
 		transition: color 0.3s ease;
 
 		@include hover {
-			color: var(--color-ember);
+			color: var(--color-accent);
 		}
 	}
 }
 
 .legal {
 	padding-top: 1.5rem;
-	border-top: 1px solid var(--color-line);
 	font-size: 0.8rem;
-	color: var(--color-paper-dim);
+	color: var(--color-text-dim);
 }

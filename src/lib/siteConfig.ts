@@ -1,6 +1,6 @@
 export const SITE_NAME = "Oskar Saks Photography";
 export const PHOTOGRAPHER = "Oskar Saks";
-export const SITE_TAGLINE = "Photographs made with patience, light, and a little nerve.";
+export const SITE_TAGLINE = "Authentic moments, beautiful light, and memories that last a lifetime.";
 export const SITE_DESCRIPTION =
   "Oskar Saks is a photographer making portraits, weddings, and editorial work. Browse the gallery, order prints, and book a session.";
 export const CONTACT_EMAIL = "hello@oskarsaks.com";

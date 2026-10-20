@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Mono, Instrument_Serif, Schibsted_Grotesk } from "next/font/google";
+import { DM_Mono, Young_Serif, Schibsted_Grotesk } from "next/font/google";
 import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
 import {
@@ -12,11 +12,10 @@ import {
 import "./reset.css";
 import "./globals.scss";
 
-const instrument = Instrument_Serif({
+const youngSerif = Young_Serif({
   subsets: ["latin"],
   weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-instrument",
+  variable: "--font-young-serif",
 });
 
 const schibsted = Schibsted_Grotesk({
@@ -45,21 +44,21 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     locale: "en_US",
     type: "website",
-    images: [{ url: "/images/hero.svg", width: 2400, height: 1600 }],
+    images: [{ url: "/images/hero.webp", width: 2000, height: 1335 }],
   },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0e0d0c",
+  themeColor: "#f4f7fb",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${instrument.variable} ${schibsted.variable} ${dmMono.variable}`}
+      className={`${youngSerif.variable} ${schibsted.variable} ${dmMono.variable}`}
     >
       <body>
         <Header />

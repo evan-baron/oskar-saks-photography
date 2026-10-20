@@ -2,7 +2,6 @@
 
 .store {
 	@include section;
-	background: var(--color-ink);
 }
 
 .inner {
@@ -31,7 +30,7 @@
 .lede {
 	max-width: 34rem;
 	font-size: 1.05rem;
-	color: hsla(40, 28%, 91%, 0.75);
+	color: color-mix(in srgb, var(--color-text) 75%, transparent);
 	text-wrap: pretty;
 }
 
@@ -64,13 +63,13 @@
 	justify-content: center;
 	aspect-ratio: 4 / 5;
 	padding: 12%;
-	background: var(--color-paper);
-	box-shadow:
-		0 1px 0 hsla(0, 0%, 100%, 0.4) inset,
-		0 1.5rem 3rem -1rem hsla(0, 0%, 0%, 0.6);
+	background: linear-gradient(160deg, var(--color-surface), var(--color-bg-raised));
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-soft);
 	transition: transform 0.7s var(--ease-out);
 
 	@include hover {
+		box-shadow: var(--shadow-lift);
 		transform: translateY(-0.4rem);
 	}
 }
@@ -79,7 +78,9 @@
 	position: relative;
 	width: 100%;
 	max-height: 100%;
-	box-shadow: 0 0.25rem 0.9rem hsla(30, 20%, 10%, 0.35);
+	border-radius: 0.5rem;
+	overflow: hidden;
+	box-shadow: 0 0.5rem 1.25rem -0.5rem hsla(218, 40%, 25%, 0.4);
 }
 
 .image {
@@ -103,7 +104,7 @@
 	p {
 		margin-top: 0.3rem;
 		font-size: 0.85rem;
-		color: var(--color-paper-dim);
+		color: var(--color-text-dim);
 	}
 
 	.price {
@@ -111,7 +112,7 @@
 		font-family: var(--font-mono);
 		font-size: 0.95rem;
 		letter-spacing: 0.05em;
-		color: var(--color-paper);
+		color: var(--color-text);
 		padding-top: 0.2rem;
 	}
 }

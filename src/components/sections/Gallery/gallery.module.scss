@@ -2,8 +2,6 @@
 
 .gallery {
 	@include section;
-	background: var(--color-ink-raised);
-	border-block: 1px solid var(--color-line);
 }
 
 .inner {
@@ -71,7 +69,7 @@
 	font-size: 0.7rem;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
-	color: var(--color-paper-dim);
+	color: var(--color-text-dim);
 	border: 1px solid var(--color-line-strong);
 	border-radius: 999px;
 	transition:
@@ -80,18 +78,18 @@
 		border-color 0.3s ease;
 
 	@include hover {
-		color: var(--color-paper);
-		border-color: var(--color-paper);
+		color: var(--color-text);
+		border-color: var(--color-text);
 	}
 }
 
 .chipActive {
-	background: var(--color-paper);
-	border-color: var(--color-paper);
-	color: var(--color-ink);
+	background: var(--gradient-accent);
+	border-color: transparent;
+	color: hsl(0, 0%, 100%);
 
 	@include hover {
-		color: var(--color-ink);
+		color: hsl(0, 0%, 100%);
 	}
 }
 
@@ -100,7 +98,7 @@
 	font-size: 0.7rem;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
-	color: var(--color-paper-dim);
+	color: var(--color-text-dim);
 }
 
 .grid {
@@ -136,7 +134,9 @@
 	display: block;
 	width: 100%;
 	overflow: hidden;
-	background: var(--color-ink-high);
+	background: var(--color-bg-high);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-soft);
 	cursor: zoom-in;
 	-webkit-user-select: none;
 	user-select: none;
@@ -159,7 +159,7 @@
 	flex-direction: column;
 	justify-content: space-between;
 	padding: 0.75rem;
-	background: linear-gradient(to top, hsla(30, 8%, 4%, 0.78), transparent 50%);
+	background: linear-gradient(to top, hsla(218, 45%, 14%, 0.72), transparent 60%);
 	opacity: 0;
 	transition: opacity 0.5s ease;
 	text-align: left;
@@ -181,7 +181,7 @@
 	font-family: var(--font-mono);
 	font-size: 0.65rem;
 	letter-spacing: 0.2em;
-	color: var(--color-ember);
+	color: hsla(0, 0%, 100%, 0.85);
 }
 
 .label {
@@ -191,6 +191,7 @@
 }
 
 .name {
+	color: hsl(0, 0%, 100%);
 	font-family: var(--font-display);
 	font-size: 1.6rem;
 	line-height: 1;
@@ -202,5 +203,5 @@
 	font-size: 0.62rem;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
-	color: var(--color-paper-dim);
+	color: hsla(0, 0%, 100%, 0.78);
 }

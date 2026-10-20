@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { INSTAGRAM_HANDLE, INSTAGRAM_URL, NAV_LINKS, PHOTOGRAPHER } from "@/lib/siteConfig";
@@ -45,8 +46,15 @@ export default function Header() {
       <div className={styles.backdrop} aria-hidden="true" />
       <div className={styles.bar}>
         <Link href="#home" className={styles.brand} onClick={closeMenu} aria-label={`${PHOTOGRAPHER}, back to top`}>
-          <span className={styles.name}>{PHOTOGRAPHER}</span>
-          <span className={styles.role}>Photography</span>
+          <Image
+            src="/images/logo.webp"
+            alt={`${PHOTOGRAPHER} Photo`}
+            width={1500}
+            height={548}
+            sizes="(min-width: 768px) 15rem, 10.5rem"
+            className={styles.logo}
+            preload
+          />
         </Link>
 
         <nav className={styles.desktopNav} aria-label="Primary">

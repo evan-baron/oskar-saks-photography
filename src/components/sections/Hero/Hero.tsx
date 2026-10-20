@@ -24,11 +24,13 @@ export default function Hero() {
         <p className={styles.eyebrow}>{LOCATION}</p>
         <h1 id="hero-title" className={styles.title}>
           <span className={styles.line}>
-            <span>Oskar</span>
+            <span>
+              Emotion <em>framed</em>
+            </span>
           </span>
           <span className={styles.line}>
             <span>
-              <em>Saks</em>
+              Memory <em>cherished</em>
             </span>
           </span>
         </h1>
