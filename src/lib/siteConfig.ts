@@ -13,7 +13,7 @@ export const NAV_LINKS = [
   { id: "home", label: "Home", href: "/" },
   { id: "about", label: "About", href: "/about" },
   { id: "gallery", label: "Gallery", href: "/gallery" },
-  { id: "store", label: "Store", href: "/#store" },
+  // { id: "store", label: "Store", href: "/#store" },
   { id: "services", label: "Services", href: "/services" },
   { id: "contact", label: "Contact", href: "#contact" },
 ] as const;

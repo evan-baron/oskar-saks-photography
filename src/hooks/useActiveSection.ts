@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import type { SectionId } from "@/lib/siteConfig";
 
-const OBSERVED: SectionId[] = ["store", "contact"];
+const OBSERVED: SectionId[] = [/* "store", */ "contact"];
 
 function routeSection(pathname: string): SectionId {
   if (pathname.startsWith("/about")) return "about";

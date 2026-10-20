@@ -116,7 +116,7 @@
 	@include from($bp-md) {
 		background: linear-gradient(
 			135deg,
-			hsla(0, 0%, 100%, 0.15) 0%,
+			hsla(0, 0%, 100%, 0.25) 0%,
 			hsla(210, 60%, 98%, 0.1) 100%
 		);
 		border-color: hsla(0, 0%, 100%, 0.25);
@@ -295,7 +295,9 @@
 			expand 1.9s var(--ease-out) 0.15s forwards,
 			drift linear both;
 		animation-timeline: auto, scroll(root);
-		animation-range: normal, 0 100svh;
+		animation-range:
+			normal,
+			0 100svh;
 
 		@media (prefers-reduced-motion: reduce) {
 			animation: none;
