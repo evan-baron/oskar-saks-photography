@@ -1,0 +1,222 @@
+@use '@/styles/mixins' as *;
+
+.contact {
+	@include section;
+	background: var(--color-ink);
+	border-top: 1px solid var(--color-line);
+}
+
+.inner {
+	@include container;
+	display: grid;
+	gap: 3.5rem;
+
+	@include from($bp-lg) {
+		grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+		gap: 6rem;
+		align-items: start;
+	}
+}
+
+.intro {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.eyebrow {
+	@include eyebrow;
+}
+
+.title {
+	@include display-title;
+}
+
+.lede {
+	max-width: 30rem;
+	font-size: 1.05rem;
+	color: hsla(40, 28%, 91%, 0.75);
+	text-wrap: pretty;
+}
+
+.details {
+	margin-top: 1rem;
+	border-top: 1px solid var(--color-line);
+
+	dl > div {
+		display: grid;
+		grid-template-columns: 6.5rem 1fr;
+		gap: 1rem;
+		padding-block: 1rem;
+		border-bottom: 1px solid var(--color-line);
+	}
+
+	dt {
+		font-family: var(--font-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: var(--color-paper-dim);
+		padding-top: 0.2rem;
+	}
+
+	dd {
+		font-family: var(--font-display);
+		font-size: 1.35rem;
+		overflow-wrap: anywhere;
+	}
+}
+
+.link {
+	@include underline-link;
+}
+
+.formWrap {
+	width: 100%;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.75rem;
+}
+
+.row {
+	display: grid;
+	gap: 1.75rem;
+
+	@include from($bp-md) {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+
+	label {
+		font-family: var(--font-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: var(--color-paper-dim);
+
+		span {
+			opacity: 0.6;
+			letter-spacing: 0.1em;
+		}
+	}
+
+	input,
+	textarea,
+	select {
+		width: 100%;
+		min-height: 3.25rem;
+		padding: 0.6rem 0;
+		font: inherit;
+		font-size: 1.05rem;
+		color: var(--color-paper);
+		background: transparent;
+		border: none;
+		border-bottom: 1px solid var(--color-line-strong);
+		border-radius: 0;
+		outline: none;
+		appearance: none;
+		-webkit-appearance: none;
+		transition: border-color 0.3s ease;
+
+		&::placeholder {
+			color: hsla(40, 28%, 91%, 0.3);
+		}
+
+		&:focus {
+			border-bottom-color: var(--color-ember);
+		}
+	}
+
+	textarea {
+		resize: vertical;
+		min-height: 9rem;
+		line-height: 1.5;
+	}
+}
+
+.select {
+	position: relative;
+
+	&::after {
+		content: '';
+		position: absolute;
+		right: 0.25rem;
+		top: 50%;
+		width: 0.5rem;
+		height: 0.5rem;
+		border-right: 1px solid var(--color-paper);
+		border-bottom: 1px solid var(--color-paper);
+		transform: translateY(-70%) rotate(45deg);
+		pointer-events: none;
+	}
+
+	select {
+		padding-right: 1.5rem;
+		cursor: pointer;
+
+		option {
+			background: var(--color-ink-raised);
+			color: var(--color-paper);
+		}
+	}
+}
+
+.trap {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+.error {
+	padding: 0.85rem 1rem;
+	font-size: 0.95rem;
+	color: var(--color-paper);
+	border-left: 2px solid var(--color-ember);
+	background: hsla(14, 82%, 58%, 0.1);
+}
+
+.submit {
+	@include button-solid;
+	width: 100%;
+	justify-content: space-between;
+	min-height: 3.75rem;
+
+	@include from($bp-md) {
+		width: auto;
+		align-self: flex-start;
+		min-width: 15rem;
+	}
+}
+
+.success {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 1.25rem;
+	padding: 2.5rem 0;
+	border-top: 1px solid var(--color-line-strong);
+	border-bottom: 1px solid var(--color-line-strong);
+
+	.successTitle {
+		@include display-title;
+		font-size: clamp(2.5rem, 9vw, 4rem);
+	}
+
+	p {
+		color: hsla(40, 28%, 91%, 0.8);
+	}
+
+	.again {
+		@include button-outline;
+	}
+}

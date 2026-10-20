@@ -1,0 +1,123 @@
+@use '@/styles/mixins' as *;
+
+.store {
+	@include section;
+	background: var(--color-ink);
+}
+
+.inner {
+	@include container;
+}
+
+.head {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	margin-bottom: 3rem;
+
+	@include from($bp-md) {
+		margin-bottom: 4.5rem;
+	}
+}
+
+.eyebrow {
+	@include eyebrow;
+}
+
+.title {
+	@include display-title;
+}
+
+.lede {
+	max-width: 34rem;
+	font-size: 1.05rem;
+	color: hsla(40, 28%, 91%, 0.75);
+	text-wrap: pretty;
+}
+
+.grid {
+	list-style: none;
+	display: grid;
+	gap: 2.5rem 1.5rem;
+	grid-template-columns: 1fr;
+
+	@include from($bp-md) {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 3.5rem 2rem;
+	}
+
+	@include from($bp-lg) {
+		grid-template-columns: repeat(4, 1fr);
+		gap: 3rem 1.5rem;
+	}
+}
+
+.card {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.mat {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	aspect-ratio: 4 / 5;
+	padding: 12%;
+	background: var(--color-paper);
+	box-shadow:
+		0 1px 0 hsla(0, 0%, 100%, 0.4) inset,
+		0 1.5rem 3rem -1rem hsla(0, 0%, 0%, 0.6);
+	transition: transform 0.7s var(--ease-out);
+
+	@include hover {
+		transform: translateY(-0.4rem);
+	}
+}
+
+.art {
+	position: relative;
+	width: 100%;
+	max-height: 100%;
+	box-shadow: 0 0.25rem 0.9rem hsla(30, 20%, 10%, 0.35);
+}
+
+.image {
+	object-fit: cover;
+}
+
+.info {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
+
+	h3 {
+		font-family: var(--font-display);
+		font-weight: 400;
+		font-size: 1.65rem;
+		line-height: 1.05;
+		letter-spacing: -0.01em;
+	}
+
+	p {
+		margin-top: 0.3rem;
+		font-size: 0.85rem;
+		color: var(--color-paper-dim);
+	}
+
+	.price {
+		margin: 0;
+		font-family: var(--font-mono);
+		font-size: 0.95rem;
+		letter-spacing: 0.05em;
+		color: var(--color-paper);
+		padding-top: 0.2rem;
+	}
+}
+
+.cta {
+	@include button-outline;
+	width: 100%;
+	margin-top: auto;
+}

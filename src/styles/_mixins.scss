@@ -1,0 +1,139 @@
+$bp-sm: 480px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+$bp-xl: 1440px;
+
+@mixin from($breakpoint) {
+	@media screen and (min-width: $breakpoint) {
+		@content;
+	}
+}
+
+@mixin hover {
+	@media (hover: hover) and (pointer: fine) {
+		&:hover {
+			@content;
+		}
+	}
+}
+
+@mixin container {
+	width: 100%;
+	max-width: var(--content-width);
+	margin-inline: auto;
+	padding-inline: var(--gutter);
+}
+
+@mixin section {
+	position: relative;
+	padding-block: var(--section-space);
+	scroll-margin-top: var(--header-height);
+}
+
+@mixin eyebrow {
+	font-family: var(--font-mono);
+	font-size: 0.7rem;
+	font-weight: 400;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--color-ember);
+	display: inline-flex;
+	align-items: center;
+	gap: 0.75rem;
+
+	&::before {
+		content: '';
+		width: 1.75rem;
+		height: 1px;
+		background: currentColor;
+	}
+}
+
+@mixin display-title {
+	font-family: var(--font-display);
+	font-weight: 400;
+	line-height: 0.95;
+	letter-spacing: -0.02em;
+	font-size: clamp(2.75rem, 11vw, 6.5rem);
+	text-wrap: balance;
+
+	em {
+		font-style: italic;
+		color: var(--color-ember);
+	}
+}
+
+@mixin button-solid {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	min-height: 3.25rem;
+	padding: 0 1.75rem;
+	font-family: var(--font-mono);
+	font-size: 0.75rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--color-ink);
+	background: var(--color-paper);
+	border: 1px solid var(--color-paper);
+	cursor: pointer;
+	transition:
+		background-color 0.3s ease,
+		color 0.3s ease,
+		border-color 0.3s ease;
+
+	@include hover {
+		background: var(--color-ember);
+		border-color: var(--color-ember);
+		color: var(--color-paper);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--color-ember);
+		outline-offset: 3px;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+@mixin button-outline {
+	@include button-solid;
+	background: transparent;
+	color: var(--color-paper);
+	border-color: var(--color-line-strong);
+
+	@include hover {
+		background: var(--color-paper);
+		border-color: var(--color-paper);
+		color: var(--color-ink);
+	}
+}
+
+@mixin underline-link {
+	position: relative;
+	display: inline-block;
+
+	&::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		bottom: -3px;
+		height: 1px;
+		width: 100%;
+		background: currentColor;
+		transform: scaleX(0);
+		transform-origin: right;
+		transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+	}
+
+	@include hover {
+		&::after {
+			transform: scaleX(1);
+			transform-origin: left;
+		}
+	}
+}
