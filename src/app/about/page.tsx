@@ -18,6 +18,7 @@ export default function AboutPage() {
 				</>
 			}
 			lede={OSKAR_INTRO}
+			portrait={{ src: '/images/oskar.webp', alt: 'Portrait of photographer Oskar Saks' }}
 		/>
 	);
 }

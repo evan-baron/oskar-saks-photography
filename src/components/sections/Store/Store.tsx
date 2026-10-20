@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import Reveal from "@/components/ui/Reveal/Reveal";
 import { PHOTOS } from "@/data/photos";
@@ -33,7 +34,7 @@ export default function Store() {
             return (
               <Reveal as="li" key={print.id} delay={(index % 2) * 100} className={styles.card}>
                 <div className={styles.mat}>
-                  <div className={styles.art} style={{ aspectRatio: `${photo.width} / ${photo.height}` }}>
+                  <div className={styles.art} style={{ '--ratio': (photo.width / photo.height).toFixed(4) } as CSSProperties}>
                     <Image
                       src={photo.src}
                       alt={photo.alt}

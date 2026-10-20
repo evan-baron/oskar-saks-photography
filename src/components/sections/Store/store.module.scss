@@ -58,11 +58,11 @@
 }
 
 .mat {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	display: grid;
+	place-items: center;
+	width: 100%;
 	aspect-ratio: 4 / 5;
-	padding: 12%;
+	container-type: size;
 	background: linear-gradient(160deg, var(--color-surface), var(--color-bg-raised));
 	border-radius: var(--radius-lg);
 	box-shadow: var(--shadow-soft);
@@ -76,8 +76,8 @@
 
 .art {
 	position: relative;
-	width: 100%;
-	max-height: 100%;
+	width: min(76cqw, calc(101cqw * var(--ratio)));
+	aspect-ratio: var(--ratio);
 	border-radius: 0.5rem;
 	overflow: hidden;
 	box-shadow: 0 0.5rem 1.25rem -0.5rem hsla(218, 40%, 25%, 0.4);

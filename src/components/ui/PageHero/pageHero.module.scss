@@ -18,6 +18,46 @@
 	gap: 1.25rem;
 }
 
+.copy {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 1.25rem;
+}
+
+.withPortrait {
+	gap: 2.5rem;
+
+	@include from($bp-md) {
+		display: grid;
+		grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+		align-items: center;
+		gap: 4rem;
+	}
+}
+
+.portrait {
+	width: min(100%, 26rem);
+	align-self: center;
+	border-radius: var(--radius-md);
+	overflow: hidden;
+	box-shadow: var(--shadow-soft);
+	isolation: isolate;
+
+	@include from($bp-md) {
+		justify-self: end;
+		width: 100%;
+	}
+
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 1;
+		object-fit: cover;
+	}
+}
+
 .back {
 	display: inline-flex;
 	align-items: center;

@@ -2,7 +2,11 @@
 
 .footer {
 	padding-block: 3rem 2rem;
-	background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--color-bg-high) 85%, transparent));
+	background: linear-gradient(
+		to bottom,
+		transparent,
+		color-mix(in srgb, var(--color-bg-high) 85%, transparent)
+	);
 	overflow: hidden;
 }
 
@@ -14,14 +18,25 @@
 }
 
 .mark {
-	font-family: var(--font-display);
-	font-size: clamp(3.5rem, 16vw, 12rem);
-	line-height: 0.85;
-	letter-spacing: -0.04em;
-	color: transparent;
-	-webkit-text-stroke: 1px var(--color-line-strong);
-	white-space: nowrap;
+	display: block;
+	width: clamp(19rem, 87vw, 65.4rem);
+	max-width: 100%;
+	height: auto;
+	overflow: visible;
 	user-select: none;
+}
+
+.markText {
+	font-family: var(--font-display);
+	font-size: 100px;
+	letter-spacing: -0.04em;
+	fill: none;
+	stroke: url(#footer-mark-gradient);
+	stroke-opacity: 0.25;
+	stroke-width: 1px;
+	stroke-linejoin: round;
+	text-rendering: geometricPrecision;
+	vector-effect: non-scaling-stroke;
 }
 
 .row {
