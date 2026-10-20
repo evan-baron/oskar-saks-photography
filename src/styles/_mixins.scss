@@ -19,7 +19,7 @@ $bp-xl: 1440px;
 
 @mixin container {
 	width: 100%;
-	max-width: var(--content-width);
+	max-width: calc(var(--content-width) + var(--gutter) * 2);
 	margin-inline: auto;
 	padding-inline: var(--gutter);
 }

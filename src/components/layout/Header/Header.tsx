@@ -49,9 +49,9 @@ export default function Header() {
           <Image
             src="/images/logo.webp"
             alt={`${PHOTOGRAPHER} Photo`}
-            width={1500}
-            height={548}
-            sizes="(min-width: 768px) 15rem, 10.5rem"
+            width={1102}
+            height={443}
+            sizes="(min-width: 768px) 11.5rem, 8rem"
             className={styles.logo}
             preload
           />
@@ -82,6 +82,7 @@ export default function Header() {
         >
           <span className={styles.toggleLabel}>{menuOpen ? "Close" : "Menu"}</span>
           <span className={styles.burger} aria-hidden="true">
+            <span />
             <span />
             <span />
           </span>

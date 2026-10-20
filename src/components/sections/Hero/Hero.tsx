@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HERO_PHOTO, PHOTO_CATEGORIES } from "@/data/photos";
 import { LOCATION, SITE_TAGLINE } from "@/lib/siteConfig";
+import Snowfall from "./Snowfall";
 import styles from "./hero.module.scss";
 
 export default function Hero() {
@@ -13,12 +14,13 @@ export default function Hero() {
           alt={HERO_PHOTO.alt}
           fill
           preload
-          sizes="100vw"
+          sizes="(min-width: 768px) 100vw, 260vw"
           quality={90}
           className={styles.image}
         />
         <div className={styles.shade} aria-hidden="true" />
       </div>
+      <Snowfall />
 
       <div className={styles.content}>
         <p className={styles.eyebrow}>{LOCATION}</p>
