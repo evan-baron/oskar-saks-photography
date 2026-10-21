@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Photo {
+  id                 String   @id
+  cloudinaryPublicId String   @unique
+  url                String
+  width              Int
+  height             Int
+  alt                String
+  title              String?
+  category           String
+  cover              Boolean  @default(false)
+  position           Int      @default(0)
+  createdAt          DateTime @default(now())
+
+  @@index([category, position])
+}
+
+model Category {
+  slug        String @id
+  heading     String
+  tagline     String
+  description String
+}
+
+// Single-row-per-key store for site-wide images (hero, about).
+model SiteImage {
+  key                String @id
+  cloudinaryPublicId String
+  url                String
+  width              Int
+  height             Int
+  alt                String
+}

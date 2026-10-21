@@ -11,7 +11,7 @@ import styles from "./header.module.scss";
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [dropdownDismissed, setDropdownDismissed] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const lastY = useRef(0);
   const active = useActiveSection();
@@ -20,9 +20,7 @@ export default function Header() {
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 24);
-      setDropdownDismissed(true);
-      const focused = document.activeElement;
-      if (focused instanceof HTMLElement && focused.closest("[data-gallery-menu]")) focused.blur();
+      setGalleryOpen(false);
       if (Math.abs(y - lastY.current) > 8) {
         setHidden(y > 400 && y > lastY.current);
         lastY.current = y;
@@ -51,7 +49,21 @@ export default function Header() {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!galleryOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setGalleryOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [galleryOpen]);
+
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  const closeGallery = () => {
+    setGalleryOpen(false);
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+  };
 
   return (
     <header
@@ -77,19 +89,25 @@ export default function Header() {
             {NAV_LINKS.map(({ id, label, href }) => (
               <li
                 key={id}
-                className={
+                className={id === "gallery" ? `${styles.hasMenu} ${galleryOpen ? styles.menuShown : ""}` : undefined}
+                onPointerEnter={id === "gallery" ? (event) => event.pointerType === "mouse" && setGalleryOpen(true) : undefined}
+                onPointerLeave={id === "gallery" ? () => setGalleryOpen(false) : undefined}
+                onFocus={
                   id === "gallery"
-                    ? `${styles.hasMenu} ${dropdownDismissed ? styles.menuDismissed : ""}`
+                    ? (event) => event.target.matches(":focus-visible") && setGalleryOpen(true)
                     : undefined
                 }
-                data-gallery-menu={id === "gallery" ? "" : undefined}
-                onPointerEnter={id === "gallery" ? () => setDropdownDismissed(false) : undefined}
-                onFocus={id === "gallery" ? () => setDropdownDismissed(false) : undefined}
+                onBlur={
+                  id === "gallery"
+                    ? (event) => !event.currentTarget.contains(event.relatedTarget) && setGalleryOpen(false)
+                    : undefined
+                }
               >
                 <Link
                   href={href}
                   className={`${styles.link} ${active === id ? styles.active : ""}`}
                   aria-current={active === id ? "page" : undefined}
+                  onClick={id === "gallery" ? closeGallery : undefined}
                 >
                   {label}
                 </Link>
@@ -97,7 +115,7 @@ export default function Header() {
                   <ul className={styles.dropdown}>
                     {CATEGORIES.map((category) => (
                       <li key={category.slug}>
-                        <Link href={`/gallery/${category.slug}`} className={styles.dropLink}>
+                        <Link href={`/gallery/${category.slug}`} className={styles.dropLink} onClick={closeGallery}>
                           {category.label}
                         </Link>
                       </li>

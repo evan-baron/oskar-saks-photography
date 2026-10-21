@@ -5,7 +5,7 @@ import styles from "@/components/sections/Gallery/categoryPage.module.scss";
 
 export const metadata: Metadata = {
   title: "Gallery",
-  description: "Browse photography galleries of families and couples by Oskar Saks.",
+  description: "Browse photography galleries of families, couples, and events by Oskar Saks.",
 };
 
 export default function GalleryPage() {
