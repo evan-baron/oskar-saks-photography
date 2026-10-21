@@ -231,7 +231,8 @@ function SortableGrid({ slug, photos }: { slug: string; photos: AdminPhoto[] }) 
   return (
     <>
       {error && <p className={styles.error}>{error}</p>}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+      {/* A fixed id keeps the library's accessibility ids identical on the server and in the browser. */}
+      <DndContext id={`photos-${slug}`} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={items.map((photo) => photo.id)} strategy={rectSortingStrategy}>
           <ul className={styles.grid}>
             {items.map((photo) => (

@@ -25,11 +25,24 @@ type TileProps = {
   number: number;
   sizes: string;
   delay?: number;
+  transitionName: string;
   preload?: boolean;
+  // True for the photo the lightbox was opened from: its tile gives up the transition name so only one element holds it.
+  lightboxOpen?: boolean;
   onOpen: (photo: Photo) => void;
 };
 
-function Tile({ photo, number, sizes, delay = 0, preload = false, onOpen }: TileProps) {
+function Tile({ photo, number, sizes, delay = 0, transitionName, preload = false, lightboxOpen = false, onOpen }: TileProps) {
+  const image = (
+    <FadeImage
+      src={photo.src}
+      alt={photo.alt}
+      fill
+      sizes={sizes}
+      preload={preload}
+      className={styles.image}
+    />
+  );
   return (
     <Reveal
       delay={delay}
@@ -42,20 +55,13 @@ function Tile({ photo, number, sizes, delay = 0, preload = false, onOpen }: Tile
         onClick={() => onOpen(photo)}
         aria-label={`Open photograph ${number}${photo.title ? `, ${photo.title}` : ""}`}
       >
-        <ViewTransition
-          name={`photo-row-${photo.id}`}
-          share="morph"
-          default="none"
-        >
-          <FadeImage
-            src={photo.src}
-            alt={photo.alt}
-            fill
-            sizes={sizes}
-            preload={preload}
-            className={styles.image}
-          />
-        </ViewTransition>
+        {lightboxOpen ? (
+          image
+        ) : (
+          <ViewTransition name={`${transitionName}-${photo.id}`} share="morph" default="none">
+            {image}
+          </ViewTransition>
+        )}
         {photo.title && (
           <span className={styles.overlay} aria-hidden="true">
             <span className={styles.name}>{photo.title}</span>
@@ -78,13 +84,21 @@ const serverColumnCount = () => COLUMNS;
 
 export default function PhotoGrid({ photos }: PhotoGridProps) {
   const columnCount = useSyncExternalStore(subscribeToResize, currentColumnCount, serverColumnCount);
+  // Changing the column count moves photos between columns, so the name includes it: the old and new copies of a
+  // photo never share a transition name while both exist.
+  const rowTransitionName = `photo-row${columnCount}`;
   const columns = useMemo(() => buildColumns(photos, columnCount), [photos, columnCount]);
   const numbers = useMemo(() => new Map(photos.map((photo, index) => [photo.id, index + 1])), [photos]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [openedId, setOpenedId] = useState<string | null>(null);
   const [layout, setLayout] = useState<"row" | "deck">("row");
   const [, startTransition] = useTransition();
   const closeLightbox = useCallback(
-    () => startTransition(() => setOpenIndex(null)),
+    () =>
+      startTransition(() => {
+        setOpenIndex(null);
+        setOpenedId(null);
+      }),
     [],
   );
 
@@ -94,6 +108,7 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
         setLayout(
           window.matchMedia("(min-width: 768px)").matches ? "row" : "deck",
         );
+        setOpenedId(photo.id);
         setOpenIndex(
           Math.max(
             photos.findIndex((item) => item.id === photo.id),
@@ -102,6 +117,17 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
         );
       }),
     [photos],
+  );
+
+  const deckImage = (photo: Photo, index: number) => (
+    <FadeImage
+      src={photo.src}
+      alt={photo.alt}
+      fill
+      sizes="calc(100vw - 2.5rem)"
+      preload={index === 0}
+      className={styles.cardImage}
+    />
   );
 
   return (
@@ -116,6 +142,8 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
                 number={numbers.get(photo.id) ?? 0}
                 sizes={`${Math.round(100 / columnCount)}vw`}
                 delay={itemIndex * 60}
+                transitionName={rowTransitionName}
+                lightboxOpen={openedId === photo.id}
                 preload={itemIndex === 0}
                 onOpen={openPhoto}
               />
@@ -138,20 +166,13 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
                 onClick={() => openPhoto(photo)}
                 aria-label={`Open photograph ${index + 1} of ${photos.length}`}
               >
-                <ViewTransition
-                  name={`photo-deck-${photo.id}`}
-                  share="morph"
-                  default="none"
-                >
-                  <FadeImage
-                    src={photo.src}
-                    alt={photo.alt}
-                    fill
-                    sizes="calc(100vw - 2.5rem)"
-                    preload={index === 0}
-                    className={styles.cardImage}
-                  />
-                </ViewTransition>
+                {openedId === photo.id ? (
+                  deckImage(photo, index)
+                ) : (
+                  <ViewTransition name={`photo-deck-${photo.id}`} share="morph" default="none">
+                    {deckImage(photo, index)}
+                  </ViewTransition>
+                )}
               </button>
             </li>
           );
@@ -162,7 +183,7 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
         <Lightbox
           photos={photos}
           index={openIndex}
-          transitionPrefix={`photo-${layout}`}
+          transitionPrefix={layout === "row" ? rowTransitionName : "photo-deck"}
           onClose={closeLightbox}
           onChange={setOpenIndex}
         />
