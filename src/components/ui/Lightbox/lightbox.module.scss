@@ -1,102 +1,77 @@
 @use '@/styles/mixins' as *;
 
+// Just the photo: a light scrim (no blur) so the page behind stays visible around the edges.
 .lightbox {
 	position: fixed;
 	inset: 0;
 	z-index: 300;
-	display: flex;
-	flex-direction: column;
-	background: color-mix(in srgb, var(--color-bg) 93%, transparent);
-	-webkit-backdrop-filter: blur(18px);
-	backdrop-filter: blur(18px);
+	color: hsl(0, 0%, 100%);
+	background: hsla(218, 45%, 10%, 0.55);
 	animation: open 0.45s var(--ease-out);
 	touch-action: pan-y;
 }
 
-.top,
-.bottom {
-	position: relative;
-	z-index: 2;
-	display: flex;
+// Controls float over the scrim so nothing takes space from the photo.
+%control {
+	display: inline-flex;
 	align-items: center;
-	justify-content: space-between;
-	padding: 0.75rem var(--gutter);
-	font-family: var(--font-mono);
-	font-size: 0.72rem;
-	letter-spacing: 0.2em;
-	text-transform: uppercase;
-}
+	justify-content: center;
+	// 2px, matching the icon strokes (the 24-unit icons render at 24px, so a stroke of 2 is exactly 2px).
+	border: 2px solid hsla(0, 0%, 100%, 0.55);
+	border-radius: 50%;
+	color: hsl(0, 0%, 100%);
+	background: hsla(218, 45%, 14%, 0.4);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	transition:
+		background-color 0.3s ease,
+		color 0.3s ease,
+		border-color 0.3s ease;
 
-.top {
-	padding-top: max(0.75rem, env(safe-area-inset-top));
-}
-
-.bottom {
-	gap: 1rem;
-	padding-bottom: max(1rem, env(safe-area-inset-bottom));
-}
-
-.counter {
-	display: flex;
-	gap: 0.6rem;
-
-	.sep {
-		color: var(--color-accent);
+	@include hover {
+		background: hsl(0, 0%, 100%);
+		border-color: transparent;
+		color: hsl(218, 45%, 14%);
 	}
 }
 
 .close {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.85rem;
-	min-height: 2.75rem;
-	padding-inline: 0.5rem;
-	margin-right: -0.5rem;
-	text-transform: uppercase;
-	letter-spacing: inherit;
-	font-size: inherit;
-	font-family: inherit;
+	@extend %control;
+	position: absolute;
+	top: max(1rem, env(safe-area-inset-top));
+	right: 1rem;
+	z-index: 3;
+	width: 2.75rem;
+	height: 2.75rem;
 
-	.x {
-		position: relative;
-		width: 1.25rem;
-		height: 1.25rem;
-
-		&::before,
-		&::after {
-			content: '';
-			position: absolute;
-			top: 50%;
-			left: 0;
-			width: 100%;
-			height: 1px;
-			background: currentColor;
-			transition: transform 0.4s var(--ease-out);
-		}
-
-		&::before {
-			transform: rotate(45deg);
-		}
-
-		&::after {
-			transform: rotate(-45deg);
-		}
-	}
-
-	@include hover {
-		color: var(--color-accent);
+	// Same size as the arrows.
+	@include from($bp-md) {
+		width: 3.25rem;
+		height: 3.25rem;
 	}
 }
 
+// Clicking anywhere outside the photo and arrows closes it, so the stage covers the whole screen.
+// It's a size container so the frame below can fit the photo's own shape inside it.
 .stage {
-	position: relative;
-	flex: 1;
-	min-height: 0;
-	padding: 0 var(--gutter);
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	container-type: size;
+	padding: 4.5rem var(--gutter) 1.5rem;
 
 	@include from($bp-md) {
-		padding-inline: 6.5rem;
+		padding: 2rem 6.5rem;
 	}
+}
+
+// Exactly the photo's size (as large as fits), so arrows can sit right against its edges.
+.frame {
+	position: relative;
+	width: min(100cqw, calc(100cqh * var(--ratio)));
+	aspect-ratio: var(--ratio);
 }
 
 .figure {
@@ -117,78 +92,45 @@
 .image {
 	object-fit: contain;
 	border-radius: var(--radius-sm);
-}
-
-.caption {
-	flex: 1;
-	text-align: center;
-	display: flex;
-	flex-direction: column;
-	gap: 0.2rem;
-
-	.title {
-		font-family: var(--font-display);
-		font-size: 1.5rem;
-		letter-spacing: -0.01em;
-		text-transform: none;
-
-		@include from($bp-md) {
-			font-size: 1.9rem;
-		}
-	}
-
-	.category {
-		color: var(--color-accent);
-		font-size: 0.7rem;
-	}
+	filter: drop-shadow(0 1rem 2.5rem hsla(218, 45%, 6%, 0.55));
 }
 
 .arrow {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 3.25rem;
-	height: 3.25rem;
-	flex: 0 0 auto;
-	font-size: 1.25rem;
-	border: 1px solid var(--color-line-strong);
-	border-radius: 50%;
-	transition:
-		background-color 0.3s ease,
-		color 0.3s ease,
-		border-color 0.3s ease;
-
-	@include hover {
-		background: var(--color-accent-soft);
-		border-color: transparent;
-		color: var(--color-accent-deep);
-	}
-}
-
-// Desktop: arrows sit either side of the photo. Below that, they stay in the bottom bar (and swiping works).
-.sideArrow {
-	display: none;
+	@extend %control;
+	position: absolute;
+	top: 50%;
+	z-index: 2;
+	width: 2.75rem;
+	height: 2.75rem;
+	transform: translateY(-50%);
 
 	@include from($bp-md) {
-		position: absolute;
-		top: 50%;
-		z-index: 2;
-		display: inline-flex;
-		transform: translateY(-50%);
+		width: 3.25rem;
+		height: 3.25rem;
 	}
 }
 
+// Drawn as an SVG so it centres exactly in the circle, unlike a text glyph.
+.icon {
+	display: block;
+	width: 1.5rem;
+	height: 1.5rem;
+}
+
+// Phones: arrows overlay the photo's edges. Larger screens: they sit just outside it, a little gap away.
 .sidePrev {
-	left: 2rem;
+	left: 0.5rem;
+
+	@include from($bp-md) {
+		left: calc(-3.25rem - 1rem);
+	}
 }
 
 .sideNext {
-	right: 2rem;
-}
+	right: 0.5rem;
 
-.bottomArrow {
 	@include from($bp-md) {
-		display: none;
+		right: calc(-3.25rem - 1rem);
 	}
 }
 

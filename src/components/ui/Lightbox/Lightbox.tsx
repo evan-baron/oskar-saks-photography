@@ -6,9 +6,10 @@ import {
   useRef,
   useState,
   ViewTransition,
+  type CSSProperties,
 } from "react";
 import Image from "next/image";
-import { getCategory, type Photo } from "@/data/photos";
+import type { Photo } from "@/data/photos";
 import styles from "./lightbox.module.scss";
 
 type LightboxProps = {
@@ -110,34 +111,32 @@ export default function Lightbox({
           go(dx < 0 ? 1 : -1);
       }}
     >
-      <div className={styles.top}>
-        <p className={styles.counter}>
-          <span>{String(index + 1).padStart(2, "0")}</span>
-          <span className={styles.sep}>/</span>
-          <span>{String(total).padStart(2, "0")}</span>
-        </p>
-        <button
-          ref={closeRef}
-          type="button"
-          className={styles.close}
-          onClick={onClose}
-        >
-          <span>Close</span>
-          <span className={styles.x} aria-hidden="true" />
-        </button>
-      </div>
+      <button
+        ref={closeRef}
+        type="button"
+        className={styles.close}
+        onClick={onClose}
+        aria-label="Close"
+      >
+        <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
 
       <div className={styles.stage} onClick={onClose}>
+        {/* The frame is exactly the photo's size, so the arrows sit against it and everything outside it closes. */}
+        <div
+          className={styles.frame}
+          style={{ "--ratio": (photo.width / photo.height).toFixed(4) } as CSSProperties}
+          onClick={(event) => event.stopPropagation()}
+        >
         <ViewTransition
           key={photo.id}
           name={`${transitionPrefix}-${photo.id}`}
           share="morph"
           default="none"
         >
-          <div
-            className={`${styles.figure} ${direction === 1 ? styles.fromRight : styles.fromLeft}`}
-            onClick={(event) => event.stopPropagation()}
-          >
+          <div className={`${styles.figure} ${direction === 1 ? styles.fromRight : styles.fromLeft}`}>
             <Image
               src={photo.src}
               alt={photo.alt}
@@ -150,51 +149,31 @@ export default function Lightbox({
         </ViewTransition>
         <button
           type="button"
-          className={`${styles.arrow} ${styles.sideArrow} ${styles.sidePrev}`}
+          className={`${styles.arrow} ${styles.sidePrev}`}
           onClick={(event) => {
             event.stopPropagation();
             go(-1);
           }}
           aria-label="Previous photograph"
         >
-          <span aria-hidden="true">←</span>
+          <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15.5 5l-7 7 7 7" />
+          </svg>
         </button>
         <button
           type="button"
-          className={`${styles.arrow} ${styles.sideArrow} ${styles.sideNext}`}
+          className={`${styles.arrow} ${styles.sideNext}`}
           onClick={(event) => {
             event.stopPropagation();
             go(1);
           }}
           aria-label="Next photograph"
         >
-          <span aria-hidden="true">→</span>
+          <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M8.5 5l7 7-7 7" />
+          </svg>
         </button>
-      </div>
-
-      <div className={styles.bottom}>
-        <button
-          type="button"
-          className={`${styles.arrow} ${styles.bottomArrow}`}
-          onClick={() => go(-1)}
-          aria-label="Previous photograph"
-        >
-          <span aria-hidden="true">←</span>
-        </button>
-        <div className={styles.caption}>
-          {photo.title && <p className={styles.title}>{photo.title}</p>}
-          <p className={styles.category}>
-            {getCategory(photo.category)?.label}
-          </p>
         </div>
-        <button
-          type="button"
-          className={`${styles.arrow} ${styles.bottomArrow}`}
-          onClick={() => go(1)}
-          aria-label="Next photograph"
-        >
-          <span aria-hidden="true">→</span>
-        </button>
       </div>
 
       <div className={styles.preload} aria-hidden="true">
