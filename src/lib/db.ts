@@ -1,5 +1,10 @@
+import { neonConfig } from "@neondatabase/serverless";
 import { PrismaNeon } from "@prisma/adapter-neon";
+import ws from "ws";
 import { PrismaClient } from "@/generated/prisma/client";
+
+// Node's built-in WebSocket fails against Neon in scripts; `ws` works everywhere this code runs.
+neonConfig.webSocketConstructor = ws;
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 

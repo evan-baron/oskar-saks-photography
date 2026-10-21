@@ -1,0 +1,43 @@
+.page {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 8rem 1.25rem 5rem;
+}
+
+.loading {
+  color: var(--color-text-dim);
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-family: var(--font-young-serif), serif;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  p {
+    color: var(--color-text-dim);
+    font-size: 0.9rem;
+  }
+}
+
+.ghost {
+  padding: 0.6rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid hsla(218, 30%, 40%, 0.3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.headActions {
+  display: flex;
+  gap: 0.6rem;
+}

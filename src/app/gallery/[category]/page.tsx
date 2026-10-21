@@ -4,7 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageHero from "@/components/ui/PageHero/PageHero";
 import PhotoGrid from "@/components/sections/Gallery/PhotoGrid";
-import { CATEGORIES, getCategory, getGalleryRows } from "@/data/photos";
+import { CATEGORIES } from "@/data/photos";
+import { getCategoryContent, getGalleryRows } from "@/lib/gallery";
 import styles from "@/components/sections/Gallery/categoryPage.module.scss";
 
 export function generateStaticParams() {
@@ -13,7 +14,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/gallery/[category]">): Promise<Metadata> {
   const { category: slug } = await params;
-  const category = getCategory(slug);
+  const category = await getCategoryContent(slug);
   if (!category) return {};
   return {
     title: `${category.label} Gallery`,
@@ -31,11 +32,11 @@ export default function CategoryPage({ params }: PageProps<"/gallery/[category]"
 
 async function CategoryContent({ params }: { params: PageProps<"/gallery/[category]">["params"] }) {
   const { category: slug } = await params;
-  const category = getCategory(slug);
+  const category = await getCategoryContent(slug);
   if (!category) notFound();
 
   const others = CATEGORIES.filter((item) => item.slug !== category.slug);
-  const rows = getGalleryRows(category.slug);
+  const rows = await getGalleryRows(category.slug);
 
   return (
     <>

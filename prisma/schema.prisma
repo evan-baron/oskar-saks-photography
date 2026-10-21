@@ -8,10 +8,12 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
+  id                 Int      @id @default(autoincrement())
+  email              String   @unique
+  passwordHash       String
+  role               String   @default("admin")
+  mustChangePassword Boolean  @default(false)
+  createdAt          DateTime @default(now())
 }
 
 model Photo {
@@ -24,10 +26,11 @@ model Photo {
   title              String?
   category           String
   cover              Boolean  @default(false)
+  row                Int      @default(0)
   position           Int      @default(0)
   createdAt          DateTime @default(now())
 
-  @@index([category, position])
+  @@index([category, row, position])
 }
 
 model Category {

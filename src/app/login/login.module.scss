@@ -1,0 +1,80 @@
+.page {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 7rem 1.25rem 4rem;
+}
+
+.card {
+  width: min(100%, 24rem);
+  padding: 2rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lift);
+
+  h1 {
+    font-family: var(--font-young-serif), serif;
+    font-size: 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-dim);
+  }
+
+  input {
+    padding: 0.75rem 0.9rem;
+    font: inherit;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--color-text);
+    background: #fff;
+    border: 1px solid hsla(218, 30%, 40%, 0.25);
+    border-radius: var(--radius-sm);
+  }
+
+  button {
+    padding: 0.85rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--color-accent-deep);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: progress;
+    }
+  }
+}
+
+.error {
+  color: #b3261e;
+  font-size: 0.9rem;
+}
+
+.note {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--color-text-dim);
+
+  a {
+    text-decoration: underline;
+  }
+}

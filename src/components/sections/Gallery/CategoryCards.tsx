@@ -2,14 +2,16 @@ import type { CSSProperties } from "react";
 import FadeImage from "@/components/ui/FadeImage/FadeImage";
 import Link from "next/link";
 import Reveal from "@/components/ui/Reveal/Reveal";
-import { CATEGORIES, getPhotosByCategory } from "@/data/photos";
+import { CATEGORIES } from "@/data/photos";
+import { getPhotosByCategory } from "@/lib/gallery";
 import styles from "./categoryCards.module.scss";
 
-export default function CategoryCards() {
+export default async function CategoryCards() {
+  const photosByCategory = await Promise.all(CATEGORIES.map((category) => getPhotosByCategory(category.slug)));
   return (
     <ul className={styles.grid} style={{ "--count": CATEGORIES.length } as CSSProperties}>
       {CATEGORIES.map((category, index) => {
-        const photos = getPhotosByCategory(category.slug);
+        const photos = photosByCategory[index];
         const cover = photos.find((photo) => photo.cover) ?? photos[0];
         if (!cover) return null;
         return (
