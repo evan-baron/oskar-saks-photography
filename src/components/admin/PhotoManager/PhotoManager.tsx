@@ -37,7 +37,6 @@ type AdminCategory = {
   slug: string;
   label: string;
   heading: string;
-  tagline: string;
   description: string;
   photos: AdminPhoto[];
 };
@@ -103,7 +102,6 @@ function CopyEditor({ category }: { category: AdminCategory }) {
             await updateCategoryAction({
               slug: category.slug,
               heading: String(formData.get("heading") ?? ""),
-              tagline: String(formData.get("tagline") ?? ""),
               description: String(formData.get("description") ?? ""),
             }),
             "Copy saved",
@@ -115,10 +113,6 @@ function CopyEditor({ category }: { category: AdminCategory }) {
       <label>
         <span>Heading</span>
         <input name="heading" defaultValue={category.heading} maxLength={120} required />
-      </label>
-      <label>
-        <span>Tagline</span>
-        <input name="tagline" defaultValue={category.tagline} maxLength={160} required />
       </label>
       <label>
         <span>Description</span>

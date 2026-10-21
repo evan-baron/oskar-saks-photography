@@ -105,15 +105,18 @@ export async function deletePhotoAction(id: string): Promise<ActionResult> {
 const copySchema = z.object({
   slug: categorySchema,
   heading: z.string().trim().min(1).max(120),
-  tagline: z.string().trim().min(1).max(160),
   description: z.string().trim().min(1).max(1200),
 });
 
 export async function updateCategoryAction(input: z.input<typeof copySchema>): Promise<ActionResult> {
   await verifyAdmin();
   const parsed = copySchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Heading, tagline and description are all required" };
-  await db.category.upsert({ where: { slug: parsed.data.slug }, create: parsed.data, update: parsed.data });
+  if (!parsed.success) return { ok: false, error: "Heading and description are both required" };
+
+  const { slug, heading, description } = parsed.data;
+  // The tagline isn't editable here: keep whatever is stored, falling back to the built-in one for a new row.
+  const tagline = CATEGORIES.find((category) => category.slug === slug)?.tagline ?? "";
+  await db.category.upsert({ where: { slug }, create: { slug, heading, tagline, description }, update: { heading, description } });
   updateTag("categories");
   return { ok: true };
 }

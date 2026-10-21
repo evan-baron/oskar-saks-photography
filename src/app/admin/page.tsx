@@ -39,7 +39,6 @@ async function AdminContent() {
       slug: category.slug,
       label: category.label,
       heading: override?.heading ?? category.heading,
-      tagline: override?.tagline ?? category.tagline,
       description: override?.description ?? category.description,
       photos: photos
         .filter((photo) => photo.category === category.slug)
