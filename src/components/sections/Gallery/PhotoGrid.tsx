@@ -2,7 +2,9 @@
 
 import {
   useCallback,
+  useMemo,
   useState,
+  useSyncExternalStore,
   useTransition,
   ViewTransition,
   type CSSProperties,
@@ -11,6 +13,7 @@ import FadeImage from "@/components/ui/FadeImage/FadeImage";
 import Lightbox from "@/components/ui/Lightbox/Lightbox";
 import Reveal from "@/components/ui/Reveal/Reveal";
 import type { Photo } from "@/data/photos";
+import { buildColumns, COLUMNS, columnsForWidth } from "@/lib/galleryLayout";
 import styles from "./photoGrid.module.scss";
 
 type PhotoGridProps = {
@@ -22,14 +25,16 @@ type TileProps = {
   number: number;
   sizes: string;
   delay?: number;
+  preload?: boolean;
   onOpen: (photo: Photo) => void;
 };
 
-function Tile({ photo, number, sizes, delay = 0, onOpen }: TileProps) {
+function Tile({ photo, number, sizes, delay = 0, preload = false, onOpen }: TileProps) {
   return (
     <Reveal
       delay={delay}
-      className={`${styles.item} ${photo.featured ? styles.featured : ""} ${photo.tall ? styles.tall : ""}`}
+      className={styles.item}
+      style={{ "--ratio": (photo.width / photo.height).toFixed(4) } as CSSProperties}
     >
       <button
         type="button"
@@ -47,6 +52,7 @@ function Tile({ photo, number, sizes, delay = 0, onOpen }: TileProps) {
             alt={photo.alt}
             fill
             sizes={sizes}
+            preload={preload}
             className={styles.image}
           />
         </ViewTransition>
@@ -62,7 +68,18 @@ function Tile({ photo, number, sizes, delay = 0, onOpen }: TileProps) {
 
 const MIN_CARD_RATIO = 0.8;
 
+// The column count follows the screen width. The server renders the default; wide screens update after hydration.
+function subscribeToResize(onChange: () => void) {
+  window.addEventListener("resize", onChange);
+  return () => window.removeEventListener("resize", onChange);
+}
+const currentColumnCount = () => columnsForWidth(window.innerWidth);
+const serverColumnCount = () => COLUMNS;
+
 export default function PhotoGrid({ photos }: PhotoGridProps) {
+  const columnCount = useSyncExternalStore(subscribeToResize, currentColumnCount, serverColumnCount);
+  const columns = useMemo(() => buildColumns(photos, columnCount), [photos, columnCount]);
+  const numbers = useMemo(() => new Map(photos.map((photo, index) => [photo.id, index + 1])), [photos]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [layout, setLayout] = useState<"row" | "deck">("row");
   const [, startTransition] = useTransition();
@@ -89,16 +106,21 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
 
   return (
     <>
-      <div className={styles.grid}>
-        {photos.map((photo, index) => (
-          <Tile
-            key={photo.id}
-            photo={photo}
-            number={index + 1}
-            sizes={photo.featured ? "100vw" : "33vw"}
-            delay={(index % 3) * 90}
-            onOpen={openPhoto}
-          />
+      <div className={styles.masonry}>
+        {columns.map((column, columnIndex) => (
+          <div key={columnIndex} className={styles.column}>
+            {column.map((photo, itemIndex) => (
+              <Tile
+                key={photo.id}
+                photo={photo}
+                number={numbers.get(photo.id) ?? 0}
+                sizes={`${Math.round(100 / columnCount)}vw`}
+                delay={itemIndex * 60}
+                preload={itemIndex === 0}
+                onOpen={openPhoto}
+              />
+            ))}
+          </div>
         ))}
       </div>
 
@@ -125,7 +147,8 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
                     src={photo.src}
                     alt={photo.alt}
                     fill
-                    sizes="100vw"
+                    sizes="calc(100vw - 2.5rem)"
+                    preload={index === 0}
                     className={styles.cardImage}
                   />
                 </ViewTransition>

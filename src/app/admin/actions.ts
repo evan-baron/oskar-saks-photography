@@ -66,8 +66,6 @@ const updateSchema = z.object({
   id: z.string().min(1),
   ...photoFields,
   cover: z.boolean(),
-  featured: z.boolean(),
-  tall: z.boolean(),
 });
 
 export async function updatePhotoAction(input: z.input<typeof updateSchema>): Promise<ActionResult> {
@@ -76,7 +74,6 @@ export async function updatePhotoAction(input: z.input<typeof updateSchema>): Pr
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid photo details" };
 
   const { id, cover, title, ...rest } = parsed.data;
-  if (rest.featured && rest.tall) return { ok: false, error: "Choose either Featured or Featured vertical, not both" };
   const photo = await db.photo.findUnique({ where: { id } });
   if (!photo) return { ok: false, error: "Photo not found" };
 

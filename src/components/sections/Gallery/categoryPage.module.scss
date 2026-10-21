@@ -3,6 +3,12 @@
 .body {
 	@include container;
 	padding-bottom: var(--section-space);
+
+	// Very wide screens: the gallery uses the whole width instead of a centred strip (see WIDE_COLUMNS_FROM).
+	@include from(1800px) {
+		max-width: none;
+		padding-inline: 4rem;
+	}
 }
 
 .pager {

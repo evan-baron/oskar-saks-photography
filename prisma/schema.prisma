@@ -28,6 +28,7 @@ model Photo {
   cover              Boolean  @default(false)
   featured           Boolean  @default(false)
   tall               Boolean  @default(false)
+  size               String   @default("medium")
   position           Int      @default(0)
   createdAt          DateTime @default(now())
 

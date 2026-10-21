@@ -43,14 +43,12 @@ async function AdminContent() {
       description: override?.description ?? category.description,
       photos: photos
         .filter((photo) => photo.category === category.slug)
-        .map(({ id, url, alt, title, cover, featured, tall }) => ({
+        .map(({ id, url, alt, title, cover }) => ({
           id,
           url,
           alt,
           title: title ?? "",
           cover,
-          featured,
-          tall,
         })),
     };
   });

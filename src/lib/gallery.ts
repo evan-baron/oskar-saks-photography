@@ -14,8 +14,6 @@ function toPhoto(row: PhotoRow): Photo {
     category: row.category as CategorySlug,
     title: row.title ?? undefined,
     cover: row.cover,
-    featured: row.featured,
-    tall: row.tall,
   };
 }
 

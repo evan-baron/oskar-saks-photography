@@ -31,8 +31,6 @@ type AdminPhoto = {
   alt: string;
   title: string;
   cover: boolean;
-  featured: boolean;
-  tall: boolean;
 };
 
 type AdminCategory = {
@@ -68,16 +66,15 @@ export default function PhotoManager({ categories }: { categories: AdminCategory
       <CopyEditor key={`copy-${category.slug}`} category={category} />
       <Uploader key={`up-${category.slug}`} slug={category.slug} />
       <p className={styles.hint}>
-        <strong>Drag a photo by its image</strong> to reorder; the others shift to make room, reading left to right
-        like the gallery. <strong>Featured</strong> photos span all three columns (wide photos work best);{" "}
-        <strong>Featured vertical</strong> photos take one column and two rows (tall photos work best); everything
-        else takes one column and is cropped to fit. The <strong>cover</strong> is the photo shown on the gallery cards.
+        <strong>Drag a photo by its image</strong> to reorder; the others shift to make room. The gallery shows photos in
+        three columns at their natural shape, uncropped, placing each one in the shortest column, so the order reads
+        left to right. The <strong>cover</strong> is the photo shown on the gallery cards.
       </p>
       {category.photos.length === 0 ? (
         <p className={styles.empty}>No photos in this gallery yet. Upload some above.</p>
       ) : (
         <SortableGrid
-          key={`${category.slug}:${category.photos.map((photo) => `${photo.id}.${photo.alt}.${photo.title}.${photo.cover}.${photo.featured}.${photo.tall}`).join("|")}`}
+          key={`${category.slug}:${category.photos.map((photo) => `${photo.id}.${photo.alt}.${photo.title}.${photo.cover}`).join("|")}`}
           slug={category.slug}
           photos={category.photos}
         />
@@ -265,17 +262,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
   }
 
   // Checkboxes save as soon as they change, so there's no separate step to forget.
-  // Featured and Featured vertical are mutually exclusive, so ticking one clears the other.
-  const saveNow = (event: ChangeEvent<HTMLInputElement>) => {
-    const { form, name, checked } = event.currentTarget;
-    if (!form) return;
-    const other = name === "featured" ? "tall" : name === "tall" ? "featured" : null;
-    if (checked && other) {
-      const input = form.elements.namedItem(other);
-      if (input instanceof HTMLInputElement) input.checked = false;
-    }
-    form.requestSubmit();
-  };
+  const saveNow = (event: ChangeEvent<HTMLInputElement>) => event.currentTarget.form?.requestSubmit();
 
   return (
     <li
@@ -306,8 +293,6 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
                 alt: String(formData.get("alt") ?? ""),
                 title: String(formData.get("title") ?? ""),
                 cover: formData.get("cover") === "on",
-                featured: formData.get("featured") === "on",
-                tall: formData.get("tall") === "on",
               }),
             );
           })
@@ -322,14 +307,6 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
           <input name="title" defaultValue={photo.title} maxLength={120} />
         </label>
         <div className={styles.checks}>
-          <label className={styles.check}>
-            <input name="featured" type="checkbox" defaultChecked={photo.featured} onChange={saveNow} />
-            <span>Featured</span>
-          </label>
-          <label className={styles.check}>
-            <input name="tall" type="checkbox" defaultChecked={photo.tall} onChange={saveNow} />
-            <span>Featured vertical</span>
-          </label>
           <label className={styles.check}>
             <input name="cover" type="checkbox" defaultChecked={photo.cover} onChange={saveNow} />
             <span>Cover</span>

@@ -21,6 +21,9 @@ type LightboxProps = {
 
 const SWIPE_THRESHOLD = 50;
 
+// The photo sits inside the stage's side padding (6.5rem each side from the md breakpoint, the page gutter below it).
+const STAGE_SIZES = "(min-width: 768px) calc(100vw - 13rem), calc(100vw - 2.5rem)";
+
 export default function Lightbox({
   photos,
   index,
@@ -139,7 +142,7 @@ export default function Lightbox({
               src={photo.src}
               alt={photo.alt}
               fill
-              sizes="100vw"
+              sizes={STAGE_SIZES}
               quality={90}
               className={styles.image}
             />
@@ -203,7 +206,7 @@ export default function Lightbox({
                 src={neighbor.src}
                 alt=""
                 fill
-                sizes="100vw"
+                sizes={STAGE_SIZES}
                 quality={90}
               />
             ),
