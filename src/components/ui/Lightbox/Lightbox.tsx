@@ -145,12 +145,34 @@ export default function Lightbox({
             />
           </div>
         </ViewTransition>
+        <button
+          type="button"
+          className={`${styles.arrow} ${styles.sideArrow} ${styles.sidePrev}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            go(-1);
+          }}
+          aria-label="Previous photograph"
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+        <button
+          type="button"
+          className={`${styles.arrow} ${styles.sideArrow} ${styles.sideNext}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            go(1);
+          }}
+          aria-label="Next photograph"
+        >
+          <span aria-hidden="true">→</span>
+        </button>
       </div>
 
       <div className={styles.bottom}>
         <button
           type="button"
-          className={styles.arrow}
+          className={`${styles.arrow} ${styles.bottomArrow}`}
           onClick={() => go(-1)}
           aria-label="Previous photograph"
         >
@@ -164,7 +186,7 @@ export default function Lightbox({
         </div>
         <button
           type="button"
-          className={styles.arrow}
+          className={`${styles.arrow} ${styles.bottomArrow}`}
           onClick={() => go(1)}
           aria-label="Next photograph"
         >

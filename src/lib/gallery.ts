@@ -14,6 +14,8 @@ function toPhoto(row: PhotoRow): Photo {
     category: row.category as CategorySlug,
     title: row.title ?? undefined,
     cover: row.cover,
+    featured: row.featured,
+    tall: row.tall,
   };
 }
 
@@ -21,18 +23,8 @@ export async function getPhotosByCategory(slug: CategorySlug): Promise<Photo[]> 
   "use cache";
   cacheTag("photos");
   cacheLife("days");
-  const rows = await db.photo.findMany({ where: { category: slug }, orderBy: [{ row: "asc" }, { position: "asc" }] });
+  const rows = await db.photo.findMany({ where: { category: slug }, orderBy: [{ position: "asc" }, { createdAt: "asc" }, { id: "asc" }] });
   return rows.map(toPhoto);
-}
-
-export async function getGalleryRows(slug: CategorySlug): Promise<Photo[][]> {
-  "use cache";
-  cacheTag("photos");
-  cacheLife("days");
-  const rows = await db.photo.findMany({ where: { category: slug }, orderBy: [{ row: "asc" }, { position: "asc" }] });
-  const grouped = new Map<number, Photo[]>();
-  for (const row of rows) grouped.set(row.row, [...(grouped.get(row.row) ?? []), toPhoto(row)]);
-  return [...grouped.values()];
 }
 
 // Copy is editable in the admin; the text in src/data/photos.ts is the fallback.

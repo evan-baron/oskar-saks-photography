@@ -95,7 +95,7 @@
 	padding: 0 var(--gutter);
 
 	@include from($bp-md) {
-		padding-inline: 5rem;
+		padding-inline: 6.5rem;
 	}
 }
 
@@ -162,6 +162,33 @@
 		background: var(--color-accent-soft);
 		border-color: transparent;
 		color: var(--color-accent-deep);
+	}
+}
+
+// Desktop: arrows sit either side of the photo. Below that, they stay in the bottom bar (and swiping works).
+.sideArrow {
+	display: none;
+
+	@include from($bp-md) {
+		position: absolute;
+		top: 50%;
+		z-index: 2;
+		display: inline-flex;
+		transform: translateY(-50%);
+	}
+}
+
+.sidePrev {
+	left: 2rem;
+}
+
+.sideNext {
+	right: 2rem;
+}
+
+.bottomArrow {
+	@include from($bp-md) {
+		display: none;
 	}
 }
 

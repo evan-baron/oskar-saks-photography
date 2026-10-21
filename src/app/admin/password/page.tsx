@@ -12,11 +12,11 @@ export const metadata: Metadata = {
 
 export default function PasswordPage() {
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <Suspense fallback={null}>
         <PasswordContent />
       </Suspense>
-    </main>
+    </div>
   );
 }
 

@@ -2,21 +2,19 @@
 
 import {
   useCallback,
-  useMemo,
   useState,
   useTransition,
   ViewTransition,
   type CSSProperties,
-  type PointerEvent,
 } from "react";
 import FadeImage from "@/components/ui/FadeImage/FadeImage";
 import Lightbox from "@/components/ui/Lightbox/Lightbox";
 import Reveal from "@/components/ui/Reveal/Reveal";
-import { getCategory, type Photo } from "@/data/photos";
+import type { Photo } from "@/data/photos";
 import styles from "./photoGrid.module.scss";
 
 type PhotoGridProps = {
-  rows: Photo[][];
+  photos: Photo[];
 };
 
 type TileProps = {
@@ -27,31 +25,16 @@ type TileProps = {
   onOpen: (photo: Photo) => void;
 };
 
-function trackPointer(event: PointerEvent<HTMLElement>) {
-  const rect = event.currentTarget.getBoundingClientRect();
-  event.currentTarget.style.setProperty(
-    "--mx",
-    `${event.clientX - rect.left}px`,
-  );
-  event.currentTarget.style.setProperty(
-    "--my",
-    `${event.clientY - rect.top}px`,
-  );
-}
-
 function Tile({ photo, number, sizes, delay = 0, onOpen }: TileProps) {
-  const ratio = photo.width / photo.height;
   return (
     <Reveal
       delay={delay}
-      className={styles.item}
-      style={{ "--ratio": ratio.toFixed(4) } as CSSProperties}
+      className={`${styles.item} ${photo.featured ? styles.featured : ""} ${photo.tall ? styles.tall : ""}`}
     >
       <button
         type="button"
         className={styles.tile}
         onClick={() => onOpen(photo)}
-        onPointerMove={trackPointer}
         aria-label={`Open photograph ${number}${photo.title ? `, ${photo.title}` : ""}`}
       >
         <ViewTransition
@@ -67,20 +50,11 @@ function Tile({ photo, number, sizes, delay = 0, onOpen }: TileProps) {
             className={styles.image}
           />
         </ViewTransition>
-        <span className={styles.cursor} aria-hidden="true">
-          View
-        </span>
-        <span className={styles.overlay} aria-hidden="true">
-          <span className={styles.number}>
-            {String(number).padStart(2, "0")}
+        {photo.title && (
+          <span className={styles.overlay} aria-hidden="true">
+            <span className={styles.name}>{photo.title}</span>
           </span>
-          <span className={styles.label}>
-            {photo.title && <span className={styles.name}>{photo.title}</span>}
-            <span className={styles.cat}>
-              {getCategory(photo.category)?.label}
-            </span>
-          </span>
-        </span>
+        )}
       </button>
     </Reveal>
   );
@@ -88,22 +62,13 @@ function Tile({ photo, number, sizes, delay = 0, onOpen }: TileProps) {
 
 const MIN_CARD_RATIO = 0.8;
 
-export default function PhotoGrid({ rows }: PhotoGridProps) {
+export default function PhotoGrid({ photos }: PhotoGridProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [layout, setLayout] = useState<"row" | "deck">("row");
   const [, startTransition] = useTransition();
   const closeLightbox = useCallback(
     () => startTransition(() => setOpenIndex(null)),
     [],
-  );
-
-  const photos = useMemo(() => rows.flat(), [rows]);
-  const starts = useMemo(
-    () =>
-      rows.map((_, i) =>
-        rows.slice(0, i).reduce((sum, row) => sum + row.length, 0),
-      ),
-    [rows],
   );
 
   const openPhoto = useCallback(
@@ -124,34 +89,17 @@ export default function PhotoGrid({ rows }: PhotoGridProps) {
 
   return (
     <>
-      <div className={styles.rows}>
-        {rows.map((row, rowIndex) => {
-          const start = starts[rowIndex] ?? 0;
-          const total = row.reduce(
-            (sum, photo) => sum + photo.width / photo.height,
-            0,
-          );
-          return (
-            <div key={rowIndex} className={styles.row}>
-              {row.map((photo, itemIndex) => {
-                const share = Math.max(
-                  Math.round((photo.width / photo.height / total) * 100),
-                  25,
-                );
-                return (
-                  <Tile
-                    key={photo.id}
-                    photo={photo}
-                    number={start + itemIndex + 1}
-                    sizes={`${share}vw`}
-                    delay={itemIndex * 90}
-                    onOpen={openPhoto}
-                  />
-                );
-              })}
-            </div>
-          );
-        })}
+      <div className={styles.grid}>
+        {photos.map((photo, index) => (
+          <Tile
+            key={photo.id}
+            photo={photo}
+            number={index + 1}
+            sizes={photo.featured ? "100vw" : "33vw"}
+            delay={(index % 3) * 90}
+            onOpen={openPhoto}
+          />
+        ))}
       </div>
 
       <ul className={styles.deck}>

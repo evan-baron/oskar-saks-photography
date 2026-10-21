@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import PageHero from "@/components/ui/PageHero/PageHero";
 import PhotoGrid from "@/components/sections/Gallery/PhotoGrid";
 import { CATEGORIES } from "@/data/photos";
-import { getCategoryContent, getGalleryRows } from "@/lib/gallery";
+import { getCategoryContent, getPhotosByCategory } from "@/lib/gallery";
 import styles from "@/components/sections/Gallery/categoryPage.module.scss";
 
 export function generateStaticParams() {
@@ -36,7 +36,7 @@ async function CategoryContent({ params }: { params: PageProps<"/gallery/[catego
   if (!category) notFound();
 
   const others = CATEGORIES.filter((item) => item.slug !== category.slug);
-  const rows = await getGalleryRows(category.slug);
+  const photos = await getPhotosByCategory(category.slug);
 
   return (
     <>
@@ -51,7 +51,7 @@ async function CategoryContent({ params }: { params: PageProps<"/gallery/[catego
         back={{ href: "/gallery", label: "All galleries" }}
       />
       <div className={styles.body}>
-        <PhotoGrid rows={rows} />
+        <PhotoGrid photos={photos} />
       </div>
       {others.length > 0 && (
         <nav className={styles.pager} aria-label="More galleries">

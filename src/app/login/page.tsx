@@ -12,11 +12,11 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <Suspense fallback={null}>
         <LoginGate />
       </Suspense>
-    </main>
+    </div>
   );
 }
 

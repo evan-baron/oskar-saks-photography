@@ -1,9 +1,22 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition, type ChangeEvent } from "react";
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   addPhotoAction,
   deletePhotoAction,
+  reorderPhotosAction,
   signUploadAction,
   updateCategoryAction,
   updatePhotoAction,
@@ -18,8 +31,8 @@ type AdminPhoto = {
   alt: string;
   title: string;
   cover: boolean;
-  row: number;
-  position: number;
+  featured: boolean;
+  tall: boolean;
 };
 
 type AdminCategory = {
@@ -55,17 +68,19 @@ export default function PhotoManager({ categories }: { categories: AdminCategory
       <CopyEditor key={`copy-${category.slug}`} category={category} />
       <Uploader key={`up-${category.slug}`} slug={category.slug} />
       <p className={styles.hint}>
-        Photos with the same <strong>row</strong> number share a row on the gallery page, ordered left to right by{" "}
-        <strong>position</strong>. The cover photo is the one shown on the gallery cards.
+        <strong>Drag a photo by its image</strong> to reorder; the others shift to make room, reading left to right
+        like the gallery. <strong>Featured</strong> photos span all three columns (wide photos work best);{" "}
+        <strong>Featured vertical</strong> photos take one column and two rows (tall photos work best); everything
+        else takes one column and is cropped to fit. The <strong>cover</strong> is the photo shown on the gallery cards.
       </p>
       {category.photos.length === 0 ? (
         <p className={styles.empty}>No photos in this gallery yet. Upload some above.</p>
       ) : (
-        <ul className={styles.grid}>
-          {category.photos.map((photo) => (
-            <PhotoCard key={`${photo.id}-${photo.alt}-${photo.title}-${photo.cover}-${photo.row}-${photo.position}`} photo={photo} />
-          ))}
-        </ul>
+        <SortableGrid
+          key={`${category.slug}:${category.photos.map((photo) => `${photo.id}.${photo.alt}.${photo.title}.${photo.cover}.${photo.featured}.${photo.tall}`).join("|")}`}
+          slug={category.slug}
+          photos={category.photos}
+        />
       )}
     </div>
   );
@@ -171,7 +186,7 @@ function Uploader({ slug }: { slug: string }) {
     <section className={styles.upload}>
       <h2>Add photos</h2>
       <input ref={input} type="file" accept={MEDIA_ACCEPT} multiple onChange={(event) => onChange(event.target.files)} />
-      <p className={styles.hint}>JPG, PNG or WebP, up to 10 MB each. New photos start in their own row at the end; edit the alt text afterwards.</p>
+      <p className={styles.hint}>JPG, PNG or WebP, up to 10 MB each. New photos are added to the end; edit the alt text afterwards.</p>
       {items.length > 0 && (
         <ul className={styles.uploads}>
           {items.map((item, index) => (
@@ -185,14 +200,103 @@ function Uploader({ slug }: { slug: string }) {
   );
 }
 
+function SortableGrid({ slug, photos }: { slug: string; photos: AdminPhoto[] }) {
+  const [items, setItems] = useState(photos);
+  const [error, setError] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+
+  // Mouse drags start after a few pixels (so clicks still work); touch needs a short press so scrolling isn't hijacked.
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  function onDragEnd({ active, over }: DragEndEvent) {
+    if (!over || active.id === over.id) return;
+    const from = items.findIndex((photo) => photo.id === active.id);
+    const to = items.findIndex((photo) => photo.id === over.id);
+    if (from === -1 || to === -1) return;
+
+    const previous = items;
+    const next = arrayMove(items, from, to);
+    setItems(next);
+    setError(null);
+    startTransition(async () => {
+      const result = await reorderPhotosAction({ category: slug, ids: next.map((photo) => photo.id) });
+      if (!result.ok) {
+        setItems(previous);
+        setError(result.error);
+      }
+    });
+  }
+
+  return (
+    <>
+      {error && <p className={styles.error}>{error}</p>}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        <SortableContext items={items.map((photo) => photo.id)} strategy={rectSortingStrategy}>
+          <ul className={styles.grid}>
+            {items.map((photo) => (
+              <PhotoCard key={photo.id} photo={photo} />
+            ))}
+          </ul>
+        </SortableContext>
+      </DndContext>
+    </>
+  );
+}
+
 function PhotoCard({ photo }: { photo: AdminPhoto }) {
   const [pending, startTransition] = useTransition();
   const { message, report } = useResult();
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: photo.id });
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, startDelete] = useTransition();
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  function confirmDelete() {
+    setDeleteError(null);
+    startDelete(async () => {
+      const result = await deletePhotoAction(photo.id);
+      if (result.ok) setConfirmingDelete(false);
+      else setDeleteError(result.error);
+    });
+  }
+
+  // Checkboxes save as soon as they change, so there's no separate step to forget.
+  // Featured and Featured vertical are mutually exclusive, so ticking one clears the other.
+  const saveNow = (event: ChangeEvent<HTMLInputElement>) => {
+    const { form, name, checked } = event.currentTarget;
+    if (!form) return;
+    const other = name === "featured" ? "tall" : name === "tall" ? "featured" : null;
+    if (checked && other) {
+      const input = form.elements.namedItem(other);
+      if (input instanceof HTMLInputElement) input.checked = false;
+    }
+    form.requestSubmit();
+  };
 
   return (
-    <li className={styles.card}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- admin previews use Cloudinary resizing directly */}
-      <img src={photo.url.replace("/upload/", "/upload/f_auto,q_auto,c_limit,w_600/")} alt={photo.alt} loading="lazy" />
+    <li
+      ref={setNodeRef}
+      className={`${styles.card} ${isDragging ? styles.dragging : ""}`}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+    >
+      <div className={styles.handle} {...attributes} {...listeners} aria-label="Drag to reorder">
+        {/* eslint-disable-next-line @next/next/no-img-element -- admin previews use Cloudinary resizing directly */}
+        <img
+          src={photo.url.replace("/upload/", "/upload/f_auto,q_auto,c_limit,w_600/")}
+          alt={photo.alt}
+          loading="lazy"
+          draggable={false}
+        />
+        <span className={styles.moveIcon} aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20" />
+          </svg>
+        </span>
+      </div>
       <form
         action={(formData) =>
           startTransition(async () => {
@@ -202,8 +306,8 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
                 alt: String(formData.get("alt") ?? ""),
                 title: String(formData.get("title") ?? ""),
                 cover: formData.get("cover") === "on",
-                row: Number(formData.get("row")),
-                position: Number(formData.get("position")),
+                featured: formData.get("featured") === "on",
+                tall: formData.get("tall") === "on",
               }),
             );
           })
@@ -217,17 +321,17 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
           <span>Title (optional)</span>
           <input name="title" defaultValue={photo.title} maxLength={120} />
         </label>
-        <div className={styles.numbers}>
-          <label>
-            <span>Row</span>
-            <input name="row" type="number" min={0} max={999} defaultValue={photo.row} required />
-          </label>
-          <label>
-            <span>Position</span>
-            <input name="position" type="number" min={0} max={999} defaultValue={photo.position} required />
+        <div className={styles.checks}>
+          <label className={styles.check}>
+            <input name="featured" type="checkbox" defaultChecked={photo.featured} onChange={saveNow} />
+            <span>Featured</span>
           </label>
           <label className={styles.check}>
-            <input name="cover" type="checkbox" defaultChecked={photo.cover} />
+            <input name="tall" type="checkbox" defaultChecked={photo.tall} onChange={saveNow} />
+            <span>Featured vertical</span>
+          </label>
+          <label className={styles.check}>
+            <input name="cover" type="checkbox" defaultChecked={photo.cover} onChange={saveNow} />
             <span>Cover</span>
           </label>
         </div>
@@ -239,16 +343,87 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
             type="button"
             className={styles.danger}
             disabled={pending}
-            onClick={() => {
-              if (!window.confirm("Delete this photo permanently? This also removes it from Cloudinary.")) return;
-              startTransition(async () => report(await deletePhotoAction(photo.id), "Deleted"));
-            }}
+            onClick={() => setConfirmingDelete(true)}
           >
             Delete
           </button>
         </div>
         {message && <p className={message.error ? styles.error : styles.ok}>{message.text}</p>}
       </form>
+      <DeleteDialog
+        open={confirmingDelete}
+        photo={photo}
+        deleting={deleting}
+        error={deleteError}
+        onCancel={() => {
+          if (deleting) return;
+          setConfirmingDelete(false);
+          setDeleteError(null);
+        }}
+        onConfirm={confirmDelete}
+      />
     </li>
+  );
+}
+
+type DeleteDialogProps = {
+  open: boolean;
+  photo: AdminPhoto;
+  deleting: boolean;
+  error: string | null;
+  onCancel: () => void;
+  onConfirm: () => void;
+};
+
+function DeleteDialog({ open, photo, deleting, error, onCancel, onConfirm }: DeleteDialogProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (open && !dialog.open) dialog.showModal();
+    if (!open && dialog.open) dialog.close();
+  }, [open]);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className={styles.dialog}
+      aria-labelledby={titleId}
+      onClose={onCancel}
+      onCancel={(event) => {
+        if (deleting) event.preventDefault();
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onCancel();
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- admin previews use Cloudinary resizing directly */}
+      <img
+        className={styles.dialogPreview}
+        src={photo.url.replace("/upload/", "/upload/f_auto,q_auto,c_fill,w_160,h_160/")}
+        alt=""
+      />
+      <h2 id={titleId} className={styles.dialogTitle}>
+        Delete this photo?
+      </h2>
+      <p className={styles.dialogText}>
+        This permanently removes it from the gallery and from Cloudinary. It can&rsquo;t be undone.
+      </p>
+      {error && (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      )}
+      <div className={styles.dialogActions}>
+        <button type="button" className={styles.outline} disabled={deleting} onClick={onCancel}>
+          Cancel
+        </button>
+        <button type="button" className={styles.dangerSolid} disabled={deleting} onClick={onConfirm}>
+          {deleting ? "Deleting…" : "Delete"}
+        </button>
+      </div>
+    </dialog>
   );
 }

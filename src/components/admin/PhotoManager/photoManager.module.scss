@@ -132,17 +132,52 @@
   }
 }
 
-.numbers {
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.25rem;
+}
+
+.handle {
+  position: relative;
+  cursor: grab;
+  touch-action: manipulation;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  img {
+    display: block;
+  }
+}
+
+.moveIcon {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: 0.6rem;
-  align-items: end;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  color: #fff;
+  background: hsla(218, 45%, 14%, 0.55);
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.dragging {
+  position: relative;
+  z-index: 10;
+  opacity: 0.85;
+  box-shadow: 0 1.25rem 2.5rem hsla(218, 45%, 14%, 0.3);
 }
 
 .check {
   flex-direction: row !important;
   align-items: center;
-  padding-bottom: 0.6rem;
 }
 
 .actions {
@@ -153,7 +188,9 @@
 }
 
 .primary,
-.danger {
+.danger,
+.dangerSolid,
+.outline {
   padding: 0.6rem 1rem;
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -189,4 +226,59 @@
 
 .error {
   color: #b3261e;
+}
+
+.dangerSolid {
+  color: #fff;
+  background: #b3261e;
+}
+
+.outline {
+  border: 1px solid hsla(218, 30%, 40%, 0.35);
+}
+
+.dialog {
+  margin: auto;
+  padding: 1.5rem;
+  width: min(26rem, calc(100% - 2rem));
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 0;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lift);
+
+  &::backdrop {
+    background: hsla(218, 45%, 14%, 0.5);
+  }
+
+  &[open] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+.dialogPreview {
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.dialogTitle {
+  font-family: var(--font-young-serif), serif;
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.dialogText {
+  font-size: 0.9rem;
+  color: var(--color-text-dim);
+}
+
+.dialogActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
 }

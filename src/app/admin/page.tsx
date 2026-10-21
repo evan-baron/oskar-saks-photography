@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CATEGORIES } from "@/data/photos";
@@ -15,18 +15,21 @@ export const metadata: Metadata = {
 
 export default function AdminPage() {
   return (
-    <main className={styles.page}>
-      <Suspense fallback={<p className={styles.loading}>Loading…</p>}>
-        <AdminContent />
-      </Suspense>
-    </main>
+    // Data refreshes after uploads and edits shouldn't animate (and the browser aborts transitions in hidden tabs).
+    <ViewTransition default="none">
+      <div className={styles.page}>
+        <Suspense fallback={<p className={styles.loading}>Loading…</p>}>
+          <AdminContent />
+        </Suspense>
+      </div>
+    </ViewTransition>
   );
 }
 
 async function AdminContent() {
   const user = await verifyAdmin();
   const [photos, overrides] = await Promise.all([
-    db.photo.findMany({ orderBy: [{ row: "asc" }, { position: "asc" }] }),
+    db.photo.findMany({ orderBy: [{ position: "asc" }, { createdAt: "asc" }, { id: "asc" }] }),
     db.category.findMany(),
   ]);
 
@@ -40,14 +43,14 @@ async function AdminContent() {
       description: override?.description ?? category.description,
       photos: photos
         .filter((photo) => photo.category === category.slug)
-        .map(({ id, url, alt, title, cover, row, position }) => ({
+        .map(({ id, url, alt, title, cover, featured, tall }) => ({
           id,
           url,
           alt,
           title: title ?? "",
           cover,
-          row,
-          position,
+          featured,
+          tall,
         })),
     };
   });

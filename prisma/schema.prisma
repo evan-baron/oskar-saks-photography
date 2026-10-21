@@ -26,11 +26,12 @@ model Photo {
   title              String?
   category           String
   cover              Boolean  @default(false)
-  row                Int      @default(0)
+  featured           Boolean  @default(false)
+  tall               Boolean  @default(false)
   position           Int      @default(0)
   createdAt          DateTime @default(now())
 
-  @@index([category, row, position])
+  @@index([category, position])
 }
 
 model Category {

@@ -9,6 +9,8 @@ export type Photo = {
   category: CategorySlug;
   title?: string;
   cover?: boolean;
+  featured?: boolean;
+  tall?: boolean;
 };
 
 export type Category = {

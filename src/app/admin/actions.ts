@@ -43,10 +43,7 @@ export async function addPhotoAction(input: { category: string; publicId: string
     return { ok: false, error: "Photos must be 10 MB or smaller" };
   }
 
-  const last = await db.photo.findFirst({
-    where: { category: category.data },
-    orderBy: [{ row: "desc" }, { position: "desc" }],
-  });
+  const last = await db.photo.aggregate({ where: { category: category.data }, _max: { position: true }, _count: true });
   await db.photo.create({
     data: {
       id: `p${randomBytes(6).toString("hex")}`,
@@ -56,9 +53,8 @@ export async function addPhotoAction(input: { category: string; publicId: string
       height: image.height,
       alt: alt.data,
       category: category.data,
-      cover: !last,
-      row: last ? last.row + 1 : 0,
-      position: 0,
+      cover: last._count === 0,
+      position: (last._max.position ?? -1) + 1,
     },
   });
   await markImagesAttached([publicId]).catch((error) => console.error("Failed to tag upload:", error));
@@ -70,8 +66,8 @@ const updateSchema = z.object({
   id: z.string().min(1),
   ...photoFields,
   cover: z.boolean(),
-  row: z.number().int().min(0).max(999),
-  position: z.number().int().min(0).max(999),
+  featured: z.boolean(),
+  tall: z.boolean(),
 });
 
 export async function updatePhotoAction(input: z.input<typeof updateSchema>): Promise<ActionResult> {
@@ -80,6 +76,7 @@ export async function updatePhotoAction(input: z.input<typeof updateSchema>): Pr
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid photo details" };
 
   const { id, cover, title, ...rest } = parsed.data;
+  if (rest.featured && rest.tall) return { ok: false, error: "Choose either Featured or Featured vertical, not both" };
   const photo = await db.photo.findUnique({ where: { id } });
   if (!photo) return { ok: false, error: "Photo not found" };
 
@@ -100,10 +97,7 @@ export async function deletePhotoAction(id: string): Promise<ActionResult> {
 
   await db.photo.delete({ where: { id } });
   if (photo.cover) {
-    const next = await db.photo.findFirst({
-      where: { category: photo.category },
-      orderBy: [{ row: "asc" }, { position: "asc" }],
-    });
+    const next = await db.photo.findFirst({ where: { category: photo.category }, orderBy: { position: "asc" } });
     if (next) await db.photo.update({ where: { id: next.id }, data: { cover: true } });
   }
   await destroyImages([photo.cloudinaryPublicId]).catch((error) => console.error("Failed to delete image:", error));
@@ -124,5 +118,24 @@ export async function updateCategoryAction(input: z.input<typeof copySchema>): P
   if (!parsed.success) return { ok: false, error: "Heading, tagline and description are all required" };
   await db.category.upsert({ where: { slug: parsed.data.slug }, create: parsed.data, update: parsed.data });
   updateTag("categories");
+  return { ok: true };
+}
+
+export async function reorderPhotosAction(input: { category: string; ids: string[] }): Promise<ActionResult> {
+  await verifyAdmin();
+  const category = categorySchema.safeParse(input.category);
+  if (!category.success || !Array.isArray(input.ids)) return { ok: false, error: "Invalid order" };
+
+  const existing = await db.photo.findMany({ where: { category: category.data }, select: { id: true } });
+  const known = new Set(existing.map((photo) => photo.id));
+  const unique = new Set(input.ids);
+  if (unique.size !== input.ids.length || unique.size !== known.size || input.ids.some((id) => !known.has(id))) {
+    return { ok: false, error: "The gallery changed. Refresh and try again." };
+  }
+
+  await db.$transaction(
+    input.ids.map((id, position) => db.photo.update({ where: { id }, data: { position } })),
+  );
+  updateTag("photos");
   return { ok: true };
 }
