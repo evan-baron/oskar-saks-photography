@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HERO_PHOTO, CATEGORIES } from "@/data/photos";
-import { LOCATION, SITE_TAGLINE } from "@/lib/siteConfig";
+import { getHomeContent, renderTitle } from "@/lib/siteContent";
 import Snowfall from "./Snowfall";
 import styles from "./hero.module.scss";
 
-export default function Hero() {
+export default async function Hero() {
+  const content = await getHomeContent();
   return (
     <section id="home" className={styles.hero} aria-labelledby="hero-title">
       <div className={styles.frame}>
@@ -23,20 +24,15 @@ export default function Hero() {
       <Snowfall />
 
       <div className={styles.content}>
-        <p className={styles.eyebrow}>{LOCATION}</p>
+        <p className={styles.eyebrow}>{content.heroEyebrow}</p>
         <h1 id="hero-title" className={styles.title}>
-          <span className={styles.line}>
-            <span>
-              Emotion <em>framed</em>
+          {content.heroTitle.split("\n").map((line, index) => (
+            <span key={index} className={styles.line}>
+              <span>{renderTitle(line)}</span>
             </span>
-          </span>
-          <span className={styles.line}>
-            <span>
-              Memory <em>cherished</em>
-            </span>
-          </span>
+          ))}
         </h1>
-        <p className={styles.tagline}>{SITE_TAGLINE}</p>
+        <p className={styles.tagline}>{content.heroTagline}</p>
         <div className={styles.actions}>
           <Link href="#gallery" className={styles.primary}>
             View the work

@@ -51,3 +51,10 @@ model SiteImage {
   height             Int
   alt                String
 }
+
+// Editable page copy, one row per page ("home", "about", "services"). `data` is validated by src/lib/contentSchema.ts;
+// a missing or invalid row falls back to the defaults in that file.
+model SiteContent {
+  key  String @id
+  data Json
+}

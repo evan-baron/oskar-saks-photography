@@ -2,7 +2,7 @@ import { Suspense, ViewTransition } from "react";
 import type { Metadata, Viewport } from "next";
 import { DM_Mono, Young_Serif, Schibsted_Grotesk } from "next/font/google";
 import Header from "@/components/layout/Header/Header";
-import Contact from "@/components/sections/Contact/Contact";
+import ContactSection from "@/components/sections/Contact/ContactSection";
 import Footer from "@/components/layout/Footer/Footer";
 import AdminShortcut from "@/components/layout/AdminShortcut/AdminShortcut";
 import {
@@ -69,7 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ViewTransition>
           <main>{children}</main>
         </ViewTransition>
-        <Contact />
+        <ContactSection />
         <Footer />
         <Suspense fallback={null}>
           <AdminShortcut />

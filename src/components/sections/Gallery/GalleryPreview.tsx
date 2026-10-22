@@ -1,20 +1,20 @@
 import Link from "next/link";
 import Reveal from "@/components/ui/Reveal/Reveal";
 import CategoryCards from "./CategoryCards";
+import { getHomeContent, renderTitle } from "@/lib/siteContent";
 import styles from "./galleryPreview.module.scss";
 
-export default function GalleryPreview() {
+export default async function GalleryPreview() {
+  const content = await getHomeContent();
   return (
     <section id="gallery" className={styles.section} aria-labelledby="gallery-title">
       <div className={styles.inner}>
         <header className={styles.head}>
           <Reveal>
-            <p className={styles.eyebrow}>Selected work</p>
+            <p className={styles.eyebrow}>{content.galleryEyebrow}</p>
           </Reveal>
           <Reveal as="h2" delay={80} className={styles.title}>
-            <span id="gallery-title">
-              The <em>galleries</em>
-            </span>
+            <span id="gallery-title">{renderTitle(content.galleryTitle)}</span>
           </Reveal>
         </header>
         <CategoryCards />

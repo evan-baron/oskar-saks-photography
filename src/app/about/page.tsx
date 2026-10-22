@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import PageHero from '@/components/ui/PageHero/PageHero';
-import { OSKAR_INTRO } from '@/data/about';
+import { getAboutContent, renderTitle } from '@/lib/siteContent';
 
 export const metadata: Metadata = {
 	title: 'About',
@@ -8,16 +8,13 @@ export const metadata: Metadata = {
 		'Meet Oskar Saks, a Colorado photographer capturing families, couples, events, and landscapes with thoughtful composition, beautiful light, and authentic moments.',
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+	const content = await getAboutContent();
 	return (
 		<PageHero
 			eyebrow='About'
-			title={
-				<>
-					Hi, I&apos;m <em>Oskar</em>!
-				</>
-			}
-			lede={OSKAR_INTRO}
+			title={renderTitle(content.pageTitle)}
+			lede={content.intro}
 			portrait={{ src: '/images/oskar.webp', alt: 'Portrait of photographer Oskar Saks' }}
 		/>
 	);

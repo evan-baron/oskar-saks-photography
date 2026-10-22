@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/ui/Reveal/Reveal";
-import { ABOUT_PARAGRAPHS } from "@/data/about";
 import { ABOUT_PHOTO } from "@/data/photos";
+import { getAboutContent, renderTitle } from "@/lib/siteContent";
 import styles from "./about.module.scss";
 
-export default function About() {
+export default async function About() {
+  const content = await getAboutContent();
   return (
     <section
       id="about"
@@ -25,7 +26,7 @@ export default function About() {
             />
           </div>
           <p className={styles.caption}>
-            <span>Oskar &amp; Katya</span>
+            <span>{content.caption}</span>
           </p>
         </Reveal>
 
@@ -34,13 +35,9 @@ export default function About() {
             <p className={styles.eyebrow}>About</p>
           </Reveal>
           <Reveal as="h2" delay={80} className={styles.title}>
-            <span id="about-title">
-              Two People
-              <br />
-              One Shared <em>Vision</em>
-            </span>
+            <span id="about-title">{renderTitle(content.sectionTitle)}</span>
           </Reveal>
-          {ABOUT_PARAGRAPHS.map((paragraph, index) => (
+          {content.paragraphs.map((paragraph, index) => (
             <Reveal key={index} as="p" delay={160 + index * 80} className={styles.paragraph}>
               {paragraph}
             </Reveal>

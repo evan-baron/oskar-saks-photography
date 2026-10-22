@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { CONTACT_TOPICS, contactSchema } from "@/lib/contactValidation";
+import { contactSchema } from "@/lib/contactValidation";
+import { contactTopics } from "@/lib/contentSchema";
+import { getServicesContent } from "@/lib/siteContent";
 import { CONTACT_EMAIL, SITE_NAME } from "@/lib/siteConfig";
 
 const MAX_BODY_BYTES = 20 * 1024;
@@ -32,7 +34,8 @@ export async function POST(request: Request) {
   }
 
   const { name, email, topic, date, message } = parsed.data;
-  const topicLabel = CONTACT_TOPICS.find((item) => item.value === topic)?.label ?? topic;
+  const topicLabel = contactTopics((await getServicesContent()).items).find((item) => item.value === topic)?.label;
+  if (!topicLabel) return NextResponse.json({ error: "Please choose what you're interested in." }, { status: 400 });
 
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.CONTACT_FROM_EMAIL;

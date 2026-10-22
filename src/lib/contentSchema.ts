@@ -1,0 +1,81 @@
+import { z } from "zod";
+import { ABOUT_PARAGRAPHS, OSKAR_INTRO } from "@/data/about";
+import { SERVICES } from "@/data/services";
+import { LOCATION, SITE_TAGLINE } from "@/lib/siteConfig";
+
+// Titles are plain text with two bits of markup: *word* is emphasised (italic accent) and a line break stays a line break.
+const title = (max: number) => z.string().trim().min(1, "Required").max(max);
+
+export const homeSchema = z.object({
+  heroEyebrow: z.string().trim().min(1).max(80),
+  heroTitle: title(120),
+  heroTagline: z.string().trim().min(1).max(240),
+  galleryEyebrow: z.string().trim().min(1).max(80),
+  galleryTitle: title(80),
+});
+
+export const aboutSchema = z.object({
+  sectionTitle: title(120),
+  caption: z.string().trim().min(1).max(80),
+  paragraphs: z.array(z.string().trim().min(1).max(1200)).min(1).max(6),
+  pageTitle: title(120),
+  intro: z.string().trim().min(1).max(2400),
+});
+
+export const serviceSchema = z.object({
+  id: z.string().min(1).max(40),
+  title: z.string().trim().min(1, "Every service needs a title").max(80),
+  description: z.string().trim().min(1, "Every service needs a description").max(600),
+  startingAt: z.number().int("Prices are whole dollars").min(0).max(1_000_000),
+  includes: z.array(z.string().trim().min(1).max(120)).max(10),
+});
+
+export const servicesSchema = z.object({
+  title: title(80),
+  lede: z.string().trim().min(1).max(400),
+  items: z.array(serviceSchema).min(1, "Keep at least one service").max(12),
+});
+
+export type HomeContent = z.infer<typeof homeSchema>;
+export type AboutContent = z.infer<typeof aboutSchema>;
+export type ServicesContent = z.infer<typeof servicesSchema>;
+export type Service = z.infer<typeof serviceSchema>;
+
+export const CONTENT = {
+  home: {
+    schema: homeSchema,
+    defaults: {
+      heroEyebrow: LOCATION,
+      heroTitle: "Emotion *framed*\nMemory *cherished*",
+      heroTagline: SITE_TAGLINE,
+      galleryEyebrow: "Selected work",
+      galleryTitle: "The *galleries*",
+    } satisfies HomeContent,
+  },
+  about: {
+    schema: aboutSchema,
+    defaults: {
+      sectionTitle: "Two People\nOne Shared *Vision*",
+      caption: "Oskar & Katya",
+      paragraphs: ABOUT_PARAGRAPHS,
+      pageTitle: "Hi, I'm *Oskar*!",
+      intro: OSKAR_INTRO,
+    } satisfies AboutContent,
+  },
+  services: {
+    schema: servicesSchema,
+    defaults: {
+      title: "Ways to *work together*",
+      lede: "Every session is built around you. Here's what's included, with starting prices to help you plan. Reach out for a custom quote.",
+      items: SERVICES,
+    } satisfies ServicesContent,
+  },
+} as const;
+
+export type ContentKey = keyof typeof CONTENT;
+
+// Contact form topics follow the services list, plus a catch-all.
+export const OTHER_TOPIC = { value: "other", label: "Something else" };
+export function contactTopics(services: Pick<Service, "id" | "title">[]) {
+  return [...services.map((service) => ({ value: service.id, label: service.title })), OTHER_TOPIC];
+}

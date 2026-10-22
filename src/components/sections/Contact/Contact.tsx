@@ -2,17 +2,19 @@
 
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import Reveal from "@/components/ui/Reveal/Reveal";
-import { CONTACT_TOPICS } from "@/lib/contactValidation";
 import { CONTACT_PREFILL_EVENT, type ContactPrefill } from "@/lib/contactPrefill";
 import { CONTACT_EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, LOCATION } from "@/lib/siteConfig";
 import styles from "./contact.module.scss";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-const EMPTY_FORM = { name: "", email: "", topic: "families", date: "", message: "", website: "" };
+type ContactProps = {
+  topics: readonly { value: string; label: string }[];
+};
 
-export default function Contact() {
-  const [form, setForm] = useState(EMPTY_FORM);
+export default function Contact({ topics }: ContactProps) {
+  const emptyForm = { name: "", email: "", topic: topics[0]?.value ?? "other", date: "", message: "", website: "" };
+  const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
 
@@ -51,7 +53,7 @@ export default function Contact() {
         setStatus("error");
         return;
       }
-      setForm(EMPTY_FORM);
+      setForm(emptyForm);
       setStatus("sent");
     } catch {
       setError("Network error. Please check your connection and try again.");
@@ -146,7 +148,7 @@ export default function Contact() {
                   <label htmlFor="topic">I&rsquo;m interested in</label>
                   <div className={styles.select}>
                     <select id="topic" name="topic" value={form.topic} onChange={handleChange}>
-                      {CONTACT_TOPICS.map((topic) => (
+                      {topics.map((topic) => (
                         <option key={topic.value} value={topic.value}>
                           {topic.label}
                         </option>
