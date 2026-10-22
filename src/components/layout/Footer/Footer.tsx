@@ -1,14 +1,15 @@
 import Link from 'next/link';
 import {
 	COPYRIGHT_YEAR,
-	INSTAGRAM_HANDLE,
-	INSTAGRAM_URL,
+	instagramUrl,
 	NAV_LINKS,
 	PHOTOGRAPHER,
 } from '@/lib/siteConfig';
+import { getContactContent } from '@/lib/siteContent';
 import styles from './footer.module.scss';
 
-export default function Footer() {
+export default async function Footer() {
+	const { instagram } = await getContactContent();
 	return (
 		<footer className={styles.footer}>
 			<div className={styles.inner}>
@@ -51,12 +52,12 @@ export default function Footer() {
 						</ul>
 					</nav>
 					<a
-						href={INSTAGRAM_URL}
+						href={instagramUrl(instagram)}
 						target='_blank'
 						rel='noopener noreferrer'
 						className={styles.social}
 					>
-						{INSTAGRAM_HANDLE}
+						@{instagram}
 					</a>
 				</div>
 				<p className={styles.legal}>

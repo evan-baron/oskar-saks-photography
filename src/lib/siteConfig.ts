@@ -3,10 +3,11 @@ export const PHOTOGRAPHER = "Oskar Saks";
 export const SITE_TAGLINE = "Authentic moments, beautiful light, and memories that last a lifetime.";
 export const SITE_DESCRIPTION =
   "Oskar Saks is a photographer photographing families and couples in Colorado. Browse the galleries, order prints, and book a session.";
-export const CONTACT_EMAIL = "hello@oskarsaks.com";
-export const INSTAGRAM_URL = "https://instagram.com/";
-export const INSTAGRAM_HANDLE = "@oskarsaks";
-export const LOCATION = "Available for travel";
+export const CONTACT_EMAIL = "oskarsaksphoto@gmail.com";
+// Username only, without the @. Contact details are editable in the admin; these are the defaults.
+export const INSTAGRAM_HANDLE = "oskarsaksphoto";
+export const instagramUrl = (handle: string) => `https://instagram.com/${handle}`;
+export const LOCATION = "Denver";
 export const COPYRIGHT_YEAR = 2026;
 
 export const NAV_LINKS = [

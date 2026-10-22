@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ABOUT_PARAGRAPHS, OSKAR_INTRO } from "@/data/about";
 import { SERVICES } from "@/data/services";
-import { LOCATION, SITE_TAGLINE } from "@/lib/siteConfig";
+import { CONTACT_EMAIL, INSTAGRAM_HANDLE, LOCATION, SITE_TAGLINE } from "@/lib/siteConfig";
 
 // Titles are plain text with two bits of markup: *word* is emphasised (italic accent) and a line break stays a line break.
 const title = (max: number) => z.string().trim().min(1, "Required").max(max);
@@ -36,7 +36,24 @@ export const servicesSchema = z.object({
   items: z.array(serviceSchema).min(1, "Keep at least one service").max(12),
 });
 
+// Accepts "oskarsaksphoto", "@oskarsaksphoto" or a pasted profile link, and keeps just the username.
+const instagramUsername = z
+  .string()
+  .trim()
+  .transform((value) => value.replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, "").replace(/^@/, "").replace(/[/?#].*$/, ""))
+  .pipe(z.string().regex(/^[A-Za-z0-9._]{1,30}$/, "Enter the username only, like oskarsaksphoto"));
+
+export const contactSchema = z.object({
+  eyebrow: z.string().trim().min(1).max(80),
+  title: title(80),
+  lede: z.string().trim().min(1).max(400),
+  email: z.string().trim().pipe(z.email("Enter a valid email address").max(200)),
+  instagram: instagramUsername,
+  location: z.string().trim().min(1).max(80),
+});
+
 export type HomeContent = z.infer<typeof homeSchema>;
+export type ContactContent = z.infer<typeof contactSchema>;
 export type AboutContent = z.infer<typeof aboutSchema>;
 export type ServicesContent = z.infer<typeof servicesSchema>;
 export type Service = z.infer<typeof serviceSchema>;
@@ -69,6 +86,17 @@ export const CONTENT = {
       lede: "Every session is built around you. Here's what's included, with starting prices to help you plan. Reach out for a custom quote.",
       items: SERVICES,
     } satisfies ServicesContent,
+  },
+  contact: {
+    schema: contactSchema,
+    defaults: {
+      eyebrow: "Contact",
+      title: "Let’s make *something*.",
+      lede: "Tell Oskar about your day, your project, or the print you can’t stop thinking about. Replies usually land within two business days.",
+      email: CONTACT_EMAIL,
+      instagram: INSTAGRAM_HANDLE,
+      location: LOCATION,
+    } satisfies ContactContent,
   },
 } as const;
 

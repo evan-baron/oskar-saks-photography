@@ -3,6 +3,7 @@ export const ADMIN_TABS = [
   { id: "about", label: "About" },
   { id: "gallery", label: "Gallery" },
   { id: "services", label: "Services" },
+  { id: "contact", label: "Contact" },
 ] as const;
 
 export type AdminTabId = (typeof ADMIN_TABS)[number]["id"];

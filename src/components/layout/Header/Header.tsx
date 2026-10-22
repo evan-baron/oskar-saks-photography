@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { CATEGORIES } from "@/data/photos";
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL, NAV_LINKS, PHOTOGRAPHER } from "@/lib/siteConfig";
+import { instagramUrl, NAV_LINKS, PHOTOGRAPHER } from "@/lib/siteConfig";
 import styles from "./header.module.scss";
 
-export default function Header() {
+export default function Header({ instagram }: { instagram: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -171,8 +171,8 @@ export default function Header() {
             ))}
           </ul>
         </nav>
-        <a className={styles.overlayFoot} href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-          {INSTAGRAM_HANDLE}
+        <a className={styles.overlayFoot} href={instagramUrl(instagram)} target="_blank" rel="noopener noreferrer">
+          @{instagram}
         </a>
       </div>
     </header>

@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { contactSchema } from "@/lib/contactValidation";
 import { contactTopics } from "@/lib/contentSchema";
-import { getServicesContent } from "@/lib/siteContent";
-import { CONTACT_EMAIL, SITE_NAME } from "@/lib/siteConfig";
+import { getContactContent, getServicesContent } from "@/lib/siteContent";
+import { SITE_NAME } from "@/lib/siteConfig";
 
 const MAX_BODY_BYTES = 20 * 1024;
 
@@ -33,13 +33,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
-  const { name, email, topic, date, message } = parsed.data;
+  const { name, email, phone, topic, date, message } = parsed.data;
   const topicLabel = contactTopics((await getServicesContent()).items).find((item) => item.value === topic)?.label;
   if (!topicLabel) return NextResponse.json({ error: "Please choose what you're interested in." }, { status: 400 });
 
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.CONTACT_FROM_EMAIL;
-  const to = process.env.CONTACT_TO_EMAIL ?? CONTACT_EMAIL;
+  // An explicit CONTACT_TO_EMAIL wins; otherwise messages go to the address shown on the site (editable in the admin).
+  const to = process.env.CONTACT_TO_EMAIL ?? (await getContactContent()).email;
 
   if (!apiKey || !from) {
     if (process.env.NODE_ENV !== "production") {
@@ -59,6 +60,7 @@ export async function POST(request: Request) {
     text: [
       `Name: ${name}`,
       `Email: ${email}`,
+      phone ? `Phone: ${phone}` : null,
       `Interested in: ${topicLabel}`,
       date ? `Date / timing: ${date}` : null,
       "",

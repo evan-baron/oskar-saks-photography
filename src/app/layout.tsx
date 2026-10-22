@@ -1,7 +1,7 @@
 import { Suspense, ViewTransition } from "react";
 import type { Metadata, Viewport } from "next";
 import { DM_Mono, Young_Serif, Schibsted_Grotesk } from "next/font/google";
-import Header from "@/components/layout/Header/Header";
+import SiteHeader from "@/components/layout/Header/SiteHeader";
 import ContactSection from "@/components/sections/Contact/ContactSection";
 import Footer from "@/components/layout/Footer/Footer";
 import HideOnAdmin from "@/components/layout/HideOnAdmin/HideOnAdmin";
@@ -66,7 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${youngSerif.variable} ${schibsted.variable} ${dmMono.variable}`}
     >
       <body>
-        <Header />
+        <SiteHeader />
         <ViewTransition>
           <main>{children}</main>
         </ViewTransition>

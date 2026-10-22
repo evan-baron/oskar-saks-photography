@@ -27,6 +27,10 @@ export async function updateAboutContentAction(input: unknown) {
   return saveContent("about", input);
 }
 
+export async function updateContactContentAction(input: unknown) {
+  return saveContent("contact", input);
+}
+
 // Services are saved as a whole list: order, additions and removals all arrive together.
 export async function updateServicesContentAction(input: unknown) {
   return saveContent("services", input);

@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import Reveal from "@/components/ui/Reveal/Reveal";
 import { CONTACT_PREFILL_EVENT, type ContactPrefill } from "@/lib/contactPrefill";
-import { CONTACT_EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, LOCATION } from "@/lib/siteConfig";
+import { instagramUrl } from "@/lib/siteConfig";
 import styles from "./contact.module.scss";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
 type ContactProps = {
+  // The title arrives already rendered (its *emphasis* becomes markup on the server).
+  content: { eyebrow: string; title: ReactNode; lede: string; email: string; instagram: string; location: string };
   topics: readonly { value: string; label: string }[];
 };
 
-export default function Contact({ topics }: ContactProps) {
-  const emptyForm = { name: "", email: "", topic: topics[0]?.value ?? "other", date: "", message: "", website: "" };
+export default function Contact({ topics, content }: ContactProps) {
+  const emptyForm = { name: "", email: "", phone: "", topic: topics[0]?.value ?? "other", date: "", message: "", website: "" };
   const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
@@ -66,38 +68,37 @@ export default function Contact({ topics }: ContactProps) {
       <div className={styles.inner}>
         <div className={styles.intro}>
           <Reveal>
-            <p className={styles.eyebrow}>Contact</p>
+            <p className={styles.eyebrow}>{content.eyebrow}</p>
           </Reveal>
           <Reveal as="h2" delay={80} className={styles.title}>
             <span id="contact-title">
-              Let&rsquo;s make <em>something</em>.
+              {content.title}
             </span>
           </Reveal>
           <Reveal as="p" delay={160} className={styles.lede}>
-            Tell Oskar about your day, your project, or the print you can&rsquo;t stop thinking about.
-            Replies usually land within two business days.
+            {content.lede}
           </Reveal>
           <Reveal delay={240} className={styles.details}>
             <dl>
               <div>
                 <dt>Email</dt>
                 <dd>
-                  <a href={`mailto:${CONTACT_EMAIL}`} className={styles.link}>
-                    {CONTACT_EMAIL}
+                  <a href={`mailto:${content.email}`} className={styles.link}>
+                    {content.email}
                   </a>
                 </dd>
               </div>
               <div>
                 <dt>Instagram</dt>
                 <dd>
-                  <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className={styles.link}>
-                    {INSTAGRAM_HANDLE}
+                  <a href={instagramUrl(content.instagram)} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                    @{content.instagram}
                   </a>
                 </dd>
               </div>
               <div>
                 <dt>Based</dt>
-                <dd>{LOCATION}</dd>
+                <dd>{content.location}</dd>
               </div>
             </dl>
           </Reveal>
@@ -129,19 +130,36 @@ export default function Contact({ topics }: ContactProps) {
                   onChange={handleChange}
                 />
               </div>
-              <div className={styles.field}>
-                <label htmlFor="email">Email</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  inputMode="email"
-                  required
-                  maxLength={200}
-                  value={form.email}
-                  onChange={handleChange}
-                />
+              <div className={styles.row}>
+                <div className={styles.field}>
+                  <label htmlFor="email">Email</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    required
+                    maxLength={200}
+                    value={form.email}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="phone">
+                    Phone <span>(optional)</span>
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    inputMode="tel"
+                    maxLength={30}
+                    value={form.phone}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
               <div className={styles.row}>
                 <div className={styles.field}>

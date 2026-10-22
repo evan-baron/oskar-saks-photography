@@ -4,13 +4,14 @@ import { CATEGORIES } from '@/data/photos';
 import AdminSkeleton from '@/components/admin/AdminSkeleton/AdminSkeleton';
 import AdminTabs from '@/components/admin/AdminTabs/AdminTabs';
 import { parseTab } from '@/components/admin/AdminTabs/tabs';
+import ContactEditor from '@/components/admin/ContentEditor/ContactEditor';
 import AboutEditor from '@/components/admin/ContentEditor/AboutEditor';
 import HomeEditor from '@/components/admin/ContentEditor/HomeEditor';
 import ServicesEditor from '@/components/admin/ContentEditor/ServicesEditor';
 import PhotoManager from '@/components/admin/PhotoManager/PhotoManager';
 import { verifyAdmin } from '@/lib/dal';
 import { db } from '@/lib/db';
-import { getAboutContent, getHomeContent, getServicesContent } from '@/lib/siteContent';
+import { getAboutContent, getContactContent, getHomeContent, getServicesContent } from '@/lib/siteContent';
 
 export const metadata: Metadata = {
 	title: 'Admin',
@@ -49,11 +50,12 @@ async function getGalleryCategories() {
 // One page holds every section; the tabs switch in the browser, so only this first load shows the skeleton.
 async function AdminConsole({ searchParams }: { searchParams: PageProps<'/admin'>['searchParams'] }) {
 	await verifyAdmin();
-	const [{ tab }, home, about, services, categories] = await Promise.all([
+	const [{ tab }, home, about, services, contact, categories] = await Promise.all([
 		searchParams,
 		getHomeContent(),
 		getAboutContent(),
 		getServicesContent(),
+		getContactContent(),
 		getGalleryCategories(),
 	]);
 
@@ -65,6 +67,7 @@ async function AdminConsole({ searchParams }: { searchParams: PageProps<'/admin'
 				about: <AboutEditor content={about} />,
 				gallery: <PhotoManager categories={categories} />,
 				services: <ServicesEditor content={services} />,
+				contact: <ContactEditor content={contact} />,
 			}}
 		/>
 	);

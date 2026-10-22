@@ -18,6 +18,7 @@ async function loadContent<K extends ContentKey>(key: K): Promise<Content<K>> {
 export const getHomeContent = () => loadContent("home");
 export const getAboutContent = () => loadContent("about");
 export const getServicesContent = () => loadContent("services");
+export const getContactContent = () => loadContent("contact");
 
 // "Two People\nOne Shared *Vision*": a line break stays a break, *word* becomes <em>.
 export function renderTitle(value: string): ReactNode {
