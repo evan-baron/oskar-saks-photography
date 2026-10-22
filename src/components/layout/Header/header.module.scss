@@ -52,6 +52,27 @@
 	}
 }
 
+// Desktop (where the full nav shows): the header stays put and keeps its top-of-page look while scrolling, with the soft gradient
+// in place of the blurred backdrop. It doesn't hide on scroll direction; it slides away only once scrolling has paused (.idle,
+// set in Header.tsx) and returns on the next scroll. Below 900px the hide-on-scroll and the backdrop still apply.
+@include from(900px) {
+	.header.hidden {
+		transform: none;
+	}
+
+	.header.idle {
+		transform: translateY(-100%);
+	}
+
+	.header.scrolled::before {
+		opacity: 1;
+	}
+
+	.header.scrolled .backdrop {
+		opacity: 0;
+	}
+}
+
 // Full width, not the page's centred container: the logo stays in the left corner of the screen and the nav is centred on the
 // screen itself (the outer columns are equal, so the middle one is centred whatever the logo's width), with the menu button
 // on the right when the nav collapses. The side padding matches a full-width gallery's.

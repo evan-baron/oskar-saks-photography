@@ -8,18 +8,38 @@ import { CATEGORIES } from "@/data/photos";
 import { instagramUrl, NAV_LINKS, PHOTOGRAPHER } from "@/lib/siteConfig";
 import styles from "./header.module.scss";
 
+// How long scrolling must pause before the desktop header slides away.
+const IDLE_HIDE_MS = 2000;
+
 export default function Header({ instagram }: { instagram: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
+  // Desktop only (see header.module.scss): the header slides away once scrolling has stopped for a few seconds.
+  const [idle, setIdle] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const lastY = useRef(0);
   const active = useActiveSection();
 
   useEffect(() => {
+    let idleTimer: number | undefined;
+    // Waits out the pause; if the pointer is over the header or someone is tabbing through it, it keeps waiting rather than vanishing
+    // under them. Plain :focus-within would also match a link that was merely clicked earlier, and the header would never hide.
+    const armIdle = () => {
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        const header = headerRef.current;
+        if (header && (header.matches(":hover") || header.querySelector(":focus-visible"))) return armIdle();
+        setIdle(true);
+      }, IDLE_HIDE_MS);
+    };
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 24);
+      setIdle(false);
+      if (y > 24) armIdle();
+      else window.clearTimeout(idleTimer);
       setGalleryOpen(false);
       if (Math.abs(y - lastY.current) > 8) {
         setHidden(y > 400 && y > lastY.current);
@@ -28,7 +48,10 @@ export default function Header({ instagram }: { instagram: string }) {
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.clearTimeout(idleTimer);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -67,8 +90,12 @@ export default function Header({ instagram }: { instagram: string }) {
 
   return (
     <header
-      className={`${styles.header} ${scrolled ? styles.scrolled : ""} ${menuOpen ? styles.open : ""} ${hidden && !menuOpen ? styles.hidden : ""}`}
-      onFocusCapture={() => setHidden(false)}
+      ref={headerRef}
+      className={`${styles.header} ${idle ? styles.idle : ""} ${scrolled ? styles.scrolled : ""} ${menuOpen ? styles.open : ""} ${hidden && !menuOpen ? styles.hidden : ""}`}
+      onFocusCapture={() => {
+        setHidden(false);
+        setIdle(false);
+      }}
     >
       <div className={styles.backdrop} aria-hidden="true" />
       <div className={styles.bar}>

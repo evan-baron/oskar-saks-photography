@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import type { SectionId } from "@/lib/siteConfig";
 
-const OBSERVED: SectionId[] = [/* "store", */ "contact"];
+// The page sections that carry an id (in the order they appear on the home page). On other pages only some exist, e.g. just
+// the contact form, and the route decides the rest.
+const SECTIONS: SectionId[] = ["home", "about", "gallery", "services", "contact"];
+
+// A section counts as the current one once its top has passed this fraction of the viewport height.
+const READING_LINE = 0.4;
 
 function routeSection(pathname: string): SectionId {
   if (pathname.startsWith("/about")) return "about";
@@ -18,26 +23,33 @@ export function useActiveSection() {
   const [observed, setObserved] = useState<SectionId | null>(null);
 
   useEffect(() => {
-    const nodes = OBSERVED.map((id) => document.getElementById(id)).filter(
-      (node): node is HTMLElement => node !== null,
-    );
-    const inView = new Set<string>();
+    let frame = 0;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) inView.add(entry.target.id);
-          else inView.delete(entry.target.id);
-        });
-        const current = OBSERVED.slice()
-          .reverse()
-          .find((id) => inView.has(id));
-        setObserved(current ?? null);
-      },
-      { rootMargin: "-40% 0px -50% 0px" },
-    );
-    nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
+    const update = () => {
+      frame = 0;
+      // Looked up each time: a page's sections can finish streaming in after the route changes.
+      const nodes = SECTIONS.map((id) => ({ id, node: document.getElementById(id) })).filter(
+        (entry): entry is { id: SectionId; node: HTMLElement } => entry.node !== null,
+      );
+      const line = window.innerHeight * READING_LINE;
+      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      // The last section whose top is above the line; at the very bottom, the last section, even if it is too short to reach it.
+      const passed = nodes.filter(({ node }) => node.getBoundingClientRect().top <= line);
+      const current = atBottom ? nodes.at(-1) : passed.at(-1);
+      setObserved(current?.id ?? null);
+    };
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
   }, [pathname]);
 
   return observed ?? routeSection(pathname);
