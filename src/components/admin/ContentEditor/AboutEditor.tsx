@@ -29,7 +29,23 @@ export default function AboutEditor({ content }: { content: AboutContent }) {
       }
     >
       <section className={styles.panel}>
-        <h2>Home page: About section</h2>
+        <h2>Hi, I&rsquo;m Oskar</h2>
+        <p className={styles.hint}>The introduction with Oskar&rsquo;s portrait. Shown at the top of the About page and on the home page.</p>
+        <label>
+          <span>
+            Heading <span className={styles.labelHint}>({TITLE_HINT})</span>
+          </span>
+          <input name="pageTitle" defaultValue={content.pageTitle} maxLength={120} required />
+        </label>
+        <label>
+          <span>Introduction</span>
+          <textarea name="intro" defaultValue={content.intro} rows={10} maxLength={2400} required />
+        </label>
+      </section>
+
+      <section className={styles.panel}>
+        <h2>Two People, One Shared Vision</h2>
+        <p className={styles.hint}>The section with the photo of Oskar and Katya. Shown below the introduction on the About page and the home page.</p>
         <label>
           <span>
             Heading <span className={styles.labelHint}>(a new line breaks the heading; {TITLE_HINT})</span>
@@ -45,20 +61,6 @@ export default function AboutEditor({ content }: { content: AboutContent }) {
             Paragraphs <span className={styles.labelHint}>(leave a blank line between paragraphs)</span>
           </span>
           <textarea name="paragraphs" defaultValue={content.paragraphs.join("\n\n")} rows={10} required />
-        </label>
-      </section>
-
-      <section className={styles.panel}>
-        <h2>About page</h2>
-        <label>
-          <span>
-            Heading <span className={styles.labelHint}>({TITLE_HINT})</span>
-          </span>
-          <input name="pageTitle" defaultValue={content.pageTitle} maxLength={120} required />
-        </label>
-        <label>
-          <span>Introduction</span>
-          <textarea name="intro" defaultValue={content.intro} rows={10} maxLength={2400} required />
         </label>
       </section>
 

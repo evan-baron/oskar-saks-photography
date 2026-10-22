@@ -2,24 +2,34 @@
 
 .about {
 	@include section;
+	// No space below on mobile: the next section's own top padding is enough.
+	padding-bottom: 0;
+
+	@include from($bp-md) {
+		padding-bottom: var(--section-space);
+	}
 }
 
 .inner {
 	@include container;
 	display: grid;
-	gap: 3rem;
+	gap: 0.75rem;
 
 	@include from($bp-lg) {
 		grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
 		gap: 6rem;
-		align-items: start;
+		// The copy is centred vertically against the photo.
+		align-items: center;
 	}
 }
 
 .media {
 	position: relative;
+	// On mobile: after the heading, before the paragraphs (the copy's pieces join the grid directly; see .copy).
+	order: 1;
 
 	@include from($bp-lg) {
+		order: 0;
 		position: sticky;
 		top: calc(var(--header-height) + 2rem);
 	}
@@ -30,8 +40,13 @@
 	aspect-ratio: 3 / 4;
 	overflow: hidden;
 	background: var(--color-bg-high);
-	border-radius: 50vw 50vw var(--radius-lg) var(--radius-lg);
+	// A plain rounded rectangle on mobile; the arched top (half-pill) is for tablet width and up.
+	border-radius: var(--radius-lg);
 	box-shadow: var(--shadow-lift);
+
+	@include from($bp-md) {
+		border-radius: 50vw 50vw var(--radius-lg) var(--radius-lg);
+	}
 
 	@include from($bp-lg) {
 		margin-right: 3rem;
@@ -59,9 +74,13 @@
 }
 
 .copy {
-	display: flex;
-	flex-direction: column;
-	gap: 1.5rem;
+	display: contents;
+
+	@include from($bp-lg) {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
 }
 
 .eyebrow {
@@ -76,6 +95,7 @@
 }
 
 .paragraph {
+	order: 2;
 	max-width: 36rem;
 	font-size: 1.05rem;
 	color: color-mix(in srgb, var(--color-text) 78%, transparent);
@@ -85,13 +105,21 @@
 		font-size: 1.15rem;
 	}
 
+	@include from($bp-lg) {
+		order: 0;
+	}
 }
 
 .actions {
+	order: 3;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.75rem;
 	margin-top: 0.75rem;
+
+	@include from($bp-lg) {
+		order: 0;
+	}
 
 	.secondary {
 		@include button-outline;

@@ -10,6 +10,18 @@
 	}
 }
 
+// A PageHero used partway down a page (see asSection): spaced like any other section, with the next section supplying the gap below.
+.section {
+	padding-top: var(--section-space);
+	padding-bottom: 0;
+	scroll-margin-top: var(--header-height);
+
+	.title {
+		font-size: clamp(2.15rem, 7.5vw, 3.9rem);
+		line-height: 1.2;
+	}
+}
+
 .inner {
 	@include container;
 	display: flex;
@@ -26,7 +38,17 @@
 }
 
 .withPortrait {
-	gap: 2.5rem;
+	gap: 0.75rem;
+
+	// On mobile the copy's pieces join the page's single column directly, so the portrait can sit between the heading and the
+	// paragraph (see .portrait and .lede). From $bp-md the copy is one block beside the portrait.
+	.copy {
+		display: contents;
+
+		@include from($bp-md) {
+			display: flex;
+		}
+	}
 
 	@include from($bp-md) {
 		display: grid;
@@ -37,6 +59,8 @@
 }
 
 .portrait {
+	// On mobile: after the heading, before the paragraph. From $bp-md it sits beside the copy as before.
+	order: 1;
 	width: min(100%, 26rem);
 	align-self: center;
 	border-radius: var(--radius-md);
@@ -45,6 +69,7 @@
 	isolation: isolate;
 
 	@include from($bp-md) {
+		order: 0;
 		justify-self: end;
 		width: 100%;
 	}
@@ -85,12 +110,14 @@
 }
 
 .lede {
+	order: 2;
 	max-width: 44rem;
 	font-size: 1.05rem;
 	color: color-mix(in srgb, var(--color-text) 78%, transparent);
 	text-wrap: pretty;
 
 	@include from($bp-md) {
+		order: 0;
 		font-size: 1.2rem;
 	}
 }

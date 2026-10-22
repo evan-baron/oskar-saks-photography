@@ -10,11 +10,14 @@ type PageHeroProps = {
   lede?: string;
   back?: { href: string; label: string };
   portrait?: { src: string; alt: string };
+  // For use as a section partway down another page (the home page's intro to Oskar) rather than as the top of a page:
+  // a section heading instead of the page's h1, normal section spacing instead of clearing the header, and a lazy portrait.
+  asSection?: { id: string };
 };
 
-export default function PageHero({ eyebrow, title, lede, back, portrait }: PageHeroProps) {
+export default function PageHero({ eyebrow, title, lede, back, portrait, asSection }: PageHeroProps) {
   return (
-    <section className={styles.hero}>
+    <section id={asSection?.id} className={`${styles.hero} ${asSection ? styles.section : ""}`}>
       <div className={`${styles.inner} ${portrait ? styles.withPortrait : ""}`}>
         <div className={styles.copy}>
         {back && (
@@ -28,7 +31,7 @@ export default function PageHero({ eyebrow, title, lede, back, portrait }: PageH
         <Reveal delay={back ? 60 : 0}>
           <p className={styles.eyebrow}>{eyebrow}</p>
         </Reveal>
-        <Reveal as="h1" delay={120} className={styles.title}>
+        <Reveal as={asSection ? "h2" : "h1"} delay={120} className={styles.title}>
           {title}
         </Reveal>
         {lede && (
@@ -46,7 +49,7 @@ export default function PageHero({ eyebrow, title, lede, back, portrait }: PageH
               height={800}
               sizes="(min-width: 768px) 28rem, 80vw"
               quality={90}
-              preload
+              preload={!asSection}
             />
           </Reveal>
         )}

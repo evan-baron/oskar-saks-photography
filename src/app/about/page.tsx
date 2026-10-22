@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import About from '@/components/sections/About/About';
 import PageHero from '@/components/ui/PageHero/PageHero';
 import { getAboutContent, renderTitle } from '@/lib/siteContent';
 
@@ -11,11 +12,14 @@ export const metadata: Metadata = {
 export default async function AboutPage() {
 	const content = await getAboutContent();
 	return (
-		<PageHero
-			eyebrow='About'
-			title={renderTitle(content.pageTitle)}
-			lede={content.intro}
-			portrait={{ src: '/images/oskar.webp', alt: 'Portrait of photographer Oskar Saks' }}
-		/>
+		<>
+			<PageHero
+				eyebrow='About'
+				title={renderTitle(content.pageTitle)}
+				lede={content.intro}
+				portrait={{ src: '/images/oskar.webp', alt: 'Portrait of photographer Oskar Saks' }}
+			/>
+			<About onAboutPage />
+		</>
 	);
 }

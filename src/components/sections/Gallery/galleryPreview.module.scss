@@ -2,6 +2,12 @@
 
 .section {
 	@include section;
+	// No space below on mobile: the next section's own top padding is enough.
+	padding-bottom: 0;
+
+	@include from($bp-md) {
+		padding-bottom: var(--section-space);
+	}
 }
 
 .inner {

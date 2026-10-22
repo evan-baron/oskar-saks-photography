@@ -5,13 +5,20 @@ import { ABOUT_PHOTO } from "@/data/photos";
 import { getAboutContent, renderTitle } from "@/lib/siteContent";
 import styles from "./about.module.scss";
 
-export default async function About() {
+type AboutProps = {
+  // On the About page itself: no link back to that page, and a different heading id (the home page's copy of this section can
+  // still be in the document, hidden, and ids must stay unique).
+  onAboutPage?: boolean;
+};
+
+export default async function About({ onAboutPage = false }: AboutProps) {
   const content = await getAboutContent();
+  const titleId = onAboutPage ? "about-page-title" : "about-title";
   return (
+    // Always follows the "Hi, I'm Oskar" introduction, which has the "about" id and the "About" eyebrow.
     <section
-      id="about"
       className={styles.about}
-      aria-labelledby="about-title"
+      aria-labelledby={titleId}
     >
       <div className={styles.inner}>
         <Reveal className={styles.media}>
@@ -31,22 +38,21 @@ export default async function About() {
         </Reveal>
 
         <div className={styles.copy}>
-          <Reveal>
-            <p className={styles.eyebrow}>About</p>
-          </Reveal>
           <Reveal as="h2" delay={80} className={styles.title}>
-            <span id="about-title">{renderTitle(content.sectionTitle)}</span>
+            <span id={titleId}>{renderTitle(content.sectionTitle)}</span>
           </Reveal>
           {content.paragraphs.map((paragraph, index) => (
             <Reveal key={index} as="p" delay={160 + index * 80} className={styles.paragraph}>
               {paragraph}
             </Reveal>
           ))}
-          <Reveal delay={260} className={styles.actions}>
-            <Link href="/about" className={styles.secondary}>
-              More about Oskar <span aria-hidden="true">→</span>
-            </Link>
-          </Reveal>
+          {!onAboutPage && (
+            <Reveal delay={260} className={styles.actions}>
+              <Link href="/about" className={styles.secondary}>
+                More about Oskar <span aria-hidden="true">→</span>
+              </Link>
+            </Reveal>
+          )}
         </div>
       </div>
     </section>

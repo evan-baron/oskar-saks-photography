@@ -27,24 +27,38 @@
 	@include display-title;
 }
 
+// Mobile: each service is its own card (title, description, then a footer with the price and the inquire button).
+// From $bp-md they become the open, ruled rows with the index number on the left.
 .list {
 	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+
+	@include from($bp-md) {
+		display: block;
+	}
 }
 
 .row {
 	position: relative;
 	isolation: isolate;
 	display: grid;
-	grid-template-columns: 2.25rem 1fr;
-	gap: 0.5rem 0.75rem;
-	padding-block: 2rem;
-	border-bottom: 1px solid var(--color-line);
-	border-radius: var(--radius-md);
+	grid-template-columns: minmax(0, 1fr);
+	gap: 0.5rem;
+	padding: 1.5rem 1.25rem 1.25rem;
+	background: var(--color-surface);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-soft);
 
 	@include from($bp-md) {
 		grid-template-columns: 4rem minmax(0, 1fr) 14rem;
 		gap: 2rem;
-		padding-block: 2.75rem;
+		padding: 2.75rem 0;
+		background: none;
+		border-bottom: 1px solid var(--color-line);
+		border-radius: var(--radius-md);
+		box-shadow: none;
 	}
 
 	&::before {
@@ -80,19 +94,25 @@
 	}
 }
 
+// The number only helps on wide screens, where it anchors the left edge of each row.
 .index {
+	display: none;
 	font-family: var(--font-mono);
 	font-size: 0.72rem;
 	letter-spacing: 0.15em;
 	color: var(--color-accent);
 	padding-top: 0.7rem;
+
+	@include from($bp-md) {
+		display: block;
+	}
 }
 
 .body {
 	h3 {
 		font-family: var(--font-display);
 		font-weight: 400;
-		font-size: clamp(1.75rem, 6.5vw, 2.9rem);
+		font-size: clamp(1.6rem, 6.5vw, 2.9rem);
 		line-height: 1.2;
 		letter-spacing: -0.02em;
 		position: relative;
@@ -114,7 +134,9 @@
 
 	> p {
 		max-width: 38rem;
-		margin-top: 0.85rem;
+		margin-top: 0.5rem;
+		font-size: 0.98rem;
+		line-height: 1.6;
 		color: color-mix(in srgb, var(--color-text) 72%, transparent);
 		text-wrap: pretty;
 	}
@@ -124,7 +146,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.5rem;
-	margin-top: 1.25rem;
+	margin-top: 1rem;
 	list-style: none;
 
 	li {
@@ -139,13 +161,16 @@
 	}
 }
 
+// Mobile: a footer inside the card, set off by a hairline, with the price on the left and the button on the right.
 .side {
 	grid-column: 1 / -1;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	margin-top: 1rem;
+	margin-top: 0.75rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--color-line);
 
 	@include from($bp-md) {
 		grid-column: auto;
@@ -153,6 +178,8 @@
 		align-items: flex-end;
 		justify-content: space-between;
 		margin-top: 0;
+		padding-top: 0;
+		border-top: 0;
 	}
 }
 
@@ -160,7 +187,7 @@
 	display: flex;
 	flex-direction: column;
 	font-family: var(--font-display);
-	font-size: 2.25rem;
+	font-size: 2rem;
 	line-height: 1;
 
 	@include from($bp-md) {
@@ -174,13 +201,18 @@
 		letter-spacing: 0.22em;
 		text-transform: uppercase;
 		color: var(--color-text-dim);
-		margin-bottom: 0.4rem;
+		margin-bottom: 0.3rem;
+
+		@include from($bp-md) {
+			margin-bottom: 0.4rem;
+		}
 	}
 }
 
 .cta {
 	@include button-outline;
 	min-width: 9rem;
+	min-height: 2.75rem;
 }
 
 .full {
@@ -194,4 +226,13 @@
 
 .moreLink {
 	@include button-outline;
+
+	// Full width and centred on mobile, so a label that has to wrap still looks deliberate.
+	width: 100%;
+	justify-content: center;
+	text-align: center;
+
+	@include from($bp-md) {
+		width: auto;
+	}
 }

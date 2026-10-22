@@ -40,12 +40,20 @@
 .details {
 	margin-top: 1rem;
 
+	// Mobile: the label sits above its value, so a long address like the email gets the full width instead of wrapping mid-word
+	// beside a label column. From $bp-md they sit side by side.
 	dl > div {
 		display: grid;
-		grid-template-columns: 6.5rem 1fr;
-		gap: 1rem;
-		padding-block: 1rem;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 0.3rem;
+		padding-block: 0.9rem;
 		border-bottom: 1px solid var(--color-line);
+
+		@include from($bp-md) {
+			grid-template-columns: 6.5rem 1fr;
+			gap: 1rem;
+			padding-block: 1rem;
+		}
 	}
 
 	dt {
@@ -54,13 +62,20 @@
 		letter-spacing: 0.2em;
 		text-transform: uppercase;
 		color: var(--color-text-dim);
-		padding-top: 0.2rem;
+
+		@include from($bp-md) {
+			padding-top: 0.2rem;
+		}
 	}
 
 	dd {
 		font-family: var(--font-display);
-		font-size: 1.35rem;
+		font-size: 1.25rem;
 		overflow-wrap: anywhere;
+
+		@include from($bp-md) {
+			font-size: 1.35rem;
+		}
 	}
 }
 
@@ -72,18 +87,33 @@
 	width: 100%;
 }
 
+// Mobile: the form is a card of its own, so it reads as a separate step from the contact details above it. From $bp-md it sits
+// on the page directly.
 .form {
 	display: flex;
 	flex-direction: column;
-	gap: 1.75rem;
+	gap: 1.25rem;
+	padding: 1.5rem 1.25rem;
+	background: var(--color-surface);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-soft);
+
+	@include from($bp-md) {
+		gap: 1.75rem;
+		padding: 0;
+		background: none;
+		border-radius: 0;
+		box-shadow: none;
+	}
 }
 
 .row {
 	display: grid;
-	gap: 1.75rem;
+	gap: 1.25rem;
 
 	@include from($bp-md) {
 		grid-template-columns: 1fr 1fr;
+		gap: 1.75rem;
 	}
 }
 
@@ -114,7 +144,8 @@
 		font: inherit;
 		font-size: 1.05rem;
 		color: var(--color-text);
-		background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+		// On mobile the fields sit on a white card, so they take a faint tint to stay visible.
+		background: color-mix(in srgb, var(--color-bg-high) 40%, var(--color-surface));
 		border: 1px solid var(--color-line);
 		border-radius: var(--radius-sm);
 		box-shadow: 0 0.5rem 1.25rem -1rem hsla(218, 40%, 25%, 0.25);
@@ -122,6 +153,10 @@
 		appearance: none;
 		-webkit-appearance: none;
 		transition: border-color 0.3s ease;
+
+		@include from($bp-md) {
+			background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+		}
 
 		&::placeholder {
 			color: color-mix(in srgb, var(--color-text) 30%, transparent);
