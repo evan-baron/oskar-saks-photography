@@ -27,7 +27,6 @@ export default async function CategoryCards() {
                 className={styles.image}
               />
               <span className={styles.shade} aria-hidden="true" />
-              <span className={styles.count}>{String(photos.length).padStart(2, "0")} photographs</span>
               <span className={styles.body}>
                 <span className={styles.name}>{category.label}</span>
                 <span className={styles.tagline}>{content[index]?.tagline ?? category.tagline}</span>

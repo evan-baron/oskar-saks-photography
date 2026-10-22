@@ -67,22 +67,6 @@
 	);
 }
 
-.count {
-	position: absolute;
-	top: 1.25rem;
-	left: 1.25rem;
-	padding: 0.4rem 0.9rem;
-	font-family: var(--font-mono);
-	font-size: 0.7rem;
-	letter-spacing: 0.18em;
-	text-transform: uppercase;
-	background: hsla(0, 0%, 100%, 0.2);
-	border: 1px solid hsla(0, 0%, 100%, 0.4);
-	border-radius: 999px;
-	-webkit-backdrop-filter: blur(10px);
-	backdrop-filter: blur(10px);
-}
-
 .body {
 	display: flex;
 	flex-direction: column;
