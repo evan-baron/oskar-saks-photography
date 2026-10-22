@@ -319,9 +319,15 @@
   }
 }
 
-.selected {
-  outline: 3px solid var(--color-accent-deep);
-  outline-offset: -3px;
+.selected::after {
+  // Drawn on top so the border also runs around the photo, not just the card behind it.
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 3px solid var(--color-accent-deep);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .selectionBar {
