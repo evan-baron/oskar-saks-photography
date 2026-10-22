@@ -3,7 +3,6 @@ import Link from "next/link";
 import { verifyAdmin } from "@/lib/dal";
 import { logout } from "@/app/login/actions";
 import AdminSkeleton from "@/components/admin/AdminSkeleton/AdminSkeleton";
-import AdminNav from "@/components/admin/AdminNav/AdminNav";
 import styles from "../admin.module.scss";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -14,7 +13,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <Suspense fallback={<AdminSkeleton variant="header" />}>
           <AdminHeader />
         </Suspense>
-        <AdminNav />
         {children}
       </div>
     </ViewTransition>

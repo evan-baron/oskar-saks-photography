@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, useTransition, type ChangeEvent } from "react";
+import { memo, useCallback, useEffect, useId, useRef, useState, useTransition, type ChangeEvent } from "react";
 import {
   closestCenter,
   DndContext,
@@ -214,6 +214,11 @@ function SortableGrid({ slug, photos, onNotice }: { slug: string; photos: AdminP
   const [, startTransition] = useTransition();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const lastToggled = useRef<string | null>(null);
+  // Read by `toggle`, so it can keep one identity across renders and let the memoised cards skip re-rendering.
+  const itemsRef = useRef(items);
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
   const [confirming, setConfirming] = useState(false);
   const [deleting, startDelete] = useTransition();
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -245,7 +250,8 @@ function SortableGrid({ slug, photos, onNotice }: { slug: string; photos: AdminP
   }
 
   // Shift-clicking selects (or clears) everything between the last ticked photo and this one.
-  function toggle(id: string, shift: boolean) {
+  const toggle = useCallback((id: string, shift: boolean) => {
+    const items = itemsRef.current;
     const anchor = lastToggled.current;
     lastToggled.current = id;
     setSelected((current) => {
@@ -265,7 +271,7 @@ function SortableGrid({ slug, photos, onNotice }: { slug: string; photos: AdminP
       }
       return next;
     });
-  }
+  }, []);
 
   function confirmBulkDelete() {
     setDeleteError(null);
@@ -298,7 +304,7 @@ function SortableGrid({ slug, photos, onNotice }: { slug: string; photos: AdminP
                 key={photo.id}
                 photo={photo}
                 selected={selected.has(photo.id)}
-                onToggle={(shift) => toggle(photo.id, shift)}
+                onToggle={toggle}
               />
             ))}
           </ul>
@@ -342,7 +348,16 @@ function SortableGrid({ slug, photos, onNotice }: { slug: string; photos: AdminP
   );
 }
 
-function PhotoCard({ photo, selected, onToggle }: { photo: AdminPhoto; selected: boolean; onToggle: (shift: boolean) => void }) {
+// Memoised: with hundreds of photos, ticking one or typing elsewhere shouldn't re-render every card.
+const PhotoCard = memo(function PhotoCard({
+  photo,
+  selected,
+  onToggle,
+}: {
+  photo: AdminPhoto;
+  selected: boolean;
+  onToggle: (id: string, shift: boolean) => void;
+}) {
   const [pending, startTransition] = useTransition();
   const { message, report } = useResult();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: photo.id });
@@ -373,7 +388,7 @@ function PhotoCard({ photo, selected, onToggle }: { photo: AdminPhoto; selected:
           type="checkbox"
           checked={selected}
           onChange={() => undefined}
-          onClick={(event) => onToggle(event.shiftKey)}
+          onClick={(event) => onToggle(photo.id, event.shiftKey)}
           aria-label="Select photo"
         />
       </label>
@@ -449,7 +464,7 @@ function PhotoCard({ photo, selected, onToggle }: { photo: AdminPhoto; selected:
       />
     </li>
   );
-}
+});
 
 type DeleteDialogProps = {
   open: boolean;

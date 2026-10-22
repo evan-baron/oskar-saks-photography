@@ -2,17 +2,22 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { CATEGORIES } from '@/data/photos';
 import AdminSkeleton from '@/components/admin/AdminSkeleton/AdminSkeleton';
+import AdminTabs from '@/components/admin/AdminTabs/AdminTabs';
+import { parseTab } from '@/components/admin/AdminTabs/tabs';
+import AboutEditor from '@/components/admin/ContentEditor/AboutEditor';
+import HomeEditor from '@/components/admin/ContentEditor/HomeEditor';
+import ServicesEditor from '@/components/admin/ContentEditor/ServicesEditor';
+import PhotoManager from '@/components/admin/PhotoManager/PhotoManager';
 import { verifyAdmin } from '@/lib/dal';
 import { db } from '@/lib/db';
-import PhotoManager from '@/components/admin/PhotoManager/PhotoManager';
+import { getAboutContent, getHomeContent, getServicesContent } from '@/lib/siteContent';
 
 export const metadata: Metadata = {
-	title: 'Gallery | Admin',
+	title: 'Admin',
 	robots: { index: false, follow: false },
 };
 
-async function AdminGalleriesContent() {
-	await verifyAdmin();
+async function getGalleryCategories() {
 	const [photos, overrides] = await Promise.all([
 		db.photo.findMany({
 			orderBy: [{ position: 'asc' }, { createdAt: 'asc' }, { id: 'asc' }],
@@ -20,7 +25,7 @@ async function AdminGalleriesContent() {
 		db.category.findMany(),
 	]);
 
-	const categories = CATEGORIES.map((category) => {
+	return CATEGORIES.map((category) => {
 		const override = overrides.find((item) => item.slug === category.slug);
 		return {
 			slug: category.slug,
@@ -39,14 +44,36 @@ async function AdminGalleriesContent() {
 				})),
 		};
 	});
-
-	return <PhotoManager categories={categories} />;
 }
 
-export default function AdminGalleriesPage() {
+// One page holds every section; the tabs switch in the browser, so only this first load shows the skeleton.
+async function AdminConsole({ searchParams }: { searchParams: PageProps<'/admin'>['searchParams'] }) {
+	await verifyAdmin();
+	const [{ tab }, home, about, services, categories] = await Promise.all([
+		searchParams,
+		getHomeContent(),
+		getAboutContent(),
+		getServicesContent(),
+		getGalleryCategories(),
+	]);
+
 	return (
-		<Suspense fallback={<AdminSkeleton variant='gallery' />}>
-			<AdminGalleriesContent />
+		<AdminTabs
+			initial={parseTab(typeof tab === 'string' ? tab : undefined)}
+			panels={{
+				home: <HomeEditor content={home} />,
+				about: <AboutEditor content={about} />,
+				gallery: <PhotoManager categories={categories} />,
+				services: <ServicesEditor content={services} />,
+			}}
+		/>
+	);
+}
+
+export default function AdminPage(props: PageProps<'/admin'>) {
+	return (
+		<Suspense fallback={<AdminSkeleton variant='form' />}>
+			<AdminConsole searchParams={props.searchParams} />
 		</Suspense>
 	);
 }
