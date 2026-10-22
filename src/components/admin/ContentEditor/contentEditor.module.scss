@@ -75,21 +75,75 @@
   gap: 1.25rem;
 }
 
-.serviceHead {
+.service {
+  gap: 0;
+  padding: 0;
+}
+
+.serviceBar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  cursor: grab;
+  touch-action: manipulation;
 
-  h3 {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 400;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-text-dim);
+  &:active {
+    cursor: grabbing;
   }
+}
+
+.grip {
+  display: grid;
+  place-items: center;
+  padding: 0 0.25rem 0 1rem;
+  color: var(--color-text-dim);
+}
+
+.toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem 1.1rem 0.5rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.serviceIndex,
+.servicePrice {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+}
+
+.serviceTitle {
+  flex: 1;
+  font-family: var(--font-young-serif), serif;
+  font-size: 1.1rem;
+}
+
+.chevron {
+  color: var(--color-text-dim);
+  transition: transform 0.2s;
+
+  &[data-open='true'] {
+    transform: rotate(180deg);
+  }
+}
+
+.serviceBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 0.25rem 1.25rem 1.25rem;
+}
+
+.dragging {
+  position: relative;
+  z-index: 10;
+  opacity: 0.85;
+  box-shadow: 0 1.25rem 2.5rem hsla(218, 45%, 14%, 0.3);
 }
 
 .tools {
