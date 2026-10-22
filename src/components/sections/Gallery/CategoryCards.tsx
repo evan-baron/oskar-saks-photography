@@ -3,11 +3,13 @@ import FadeImage from "@/components/ui/FadeImage/FadeImage";
 import Link from "next/link";
 import Reveal from "@/components/ui/Reveal/Reveal";
 import { CATEGORIES } from "@/data/photos";
-import { getPhotosByCategory } from "@/lib/gallery";
+import { getCategoryContent, getPhotosByCategory } from "@/lib/gallery";
 import styles from "./categoryCards.module.scss";
 
 export default async function CategoryCards() {
   const photosByCategory = await Promise.all(CATEGORIES.map((category) => getPhotosByCategory(category.slug)));
+  // Taglines are editable in the admin, so read the saved copy rather than the built-in default.
+  const content = await Promise.all(CATEGORIES.map((category) => getCategoryContent(category.slug)));
   return (
     <ul className={styles.grid} style={{ "--count": CATEGORIES.length } as CSSProperties}>
       {CATEGORIES.map((category, index) => {
@@ -28,7 +30,7 @@ export default async function CategoryCards() {
               <span className={styles.count}>{String(photos.length).padStart(2, "0")} photographs</span>
               <span className={styles.body}>
                 <span className={styles.name}>{category.label}</span>
-                <span className={styles.tagline}>{category.tagline}</span>
+                <span className={styles.tagline}>{content[index]?.tagline ?? category.tagline}</span>
                 <span className={styles.view}>
                   View gallery <span aria-hidden="true">→</span>
                 </span>

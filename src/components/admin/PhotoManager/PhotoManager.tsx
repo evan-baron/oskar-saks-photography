@@ -117,7 +117,9 @@ function CopyEditor({ category }: { category: AdminCategory }) {
         <input name="heading" defaultValue={category.heading} maxLength={120} required />
       </label>
       <label>
-        <span>Tagline</span>
+        <span>
+          Tagline <span className={styles.labelHint}>(the short line under the gallery name on its card)</span>
+        </span>
         <input name="tagline" defaultValue={category.tagline} maxLength={160} required />
       </label>
       <label>
