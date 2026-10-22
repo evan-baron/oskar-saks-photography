@@ -16,6 +16,7 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   addPhotoAction,
   deletePhotoAction,
+  deletePhotosAction,
   reorderPhotosAction,
   signUploadAction,
   updateCategoryAction,
@@ -44,6 +45,8 @@ type AdminCategory = {
 
 export default function PhotoManager({ categories }: { categories: AdminCategory[] }) {
   const [active, setActive] = useState(categories[0]?.slug ?? "");
+  // Lives here, not in the grid, because the grid remounts when its photos change (e.g. after a delete).
+  const [notice, setNotice] = useState<string | null>(null);
   const category = categories.find((item) => item.slug === active) ?? categories[0];
   if (!category) return null;
 
@@ -57,7 +60,10 @@ export default function PhotoManager({ categories }: { categories: AdminCategory
             role="tab"
             aria-selected={item.slug === category.slug}
             className={item.slug === category.slug ? styles.tabActive : styles.tab}
-            onClick={() => setActive(item.slug)}
+            onClick={() => {
+              setActive(item.slug);
+              setNotice(null);
+            }}
           >
             {item.label} <span>{item.photos.length}</span>
           </button>
@@ -68,8 +74,10 @@ export default function PhotoManager({ categories }: { categories: AdminCategory
       <p className={styles.hint}>
         <strong>Drag a photo by its image</strong> to reorder; the others shift to make room. The gallery shows photos in
         three columns at their natural shape, uncropped, placing each one in the shortest column, so the order reads
-        left to right. The <strong>cover</strong> is the photo shown on the gallery cards.
+        left to right. The <strong>cover</strong> is the photo shown on the gallery cards. Tick the box on a photo to select
+        several (shift-click selects a range), then delete them together.
       </p>
+      {notice && <p className={styles.ok}>{notice}</p>}
       {category.photos.length === 0 ? (
         <p className={styles.empty}>No photos in this gallery yet. Upload some above.</p>
       ) : (
@@ -77,6 +85,7 @@ export default function PhotoManager({ categories }: { categories: AdminCategory
           key={`${category.slug}:${category.photos.map((photo) => `${photo.id}.${photo.alt}.${photo.title}.${photo.cover}`).join("|")}`}
           slug={category.slug}
           photos={category.photos}
+          onNotice={setNotice}
         />
       )}
     </div>
@@ -199,10 +208,15 @@ function Uploader({ slug }: { slug: string }) {
   );
 }
 
-function SortableGrid({ slug, photos }: { slug: string; photos: AdminPhoto[] }) {
+function SortableGrid({ slug, photos, onNotice }: { slug: string; photos: AdminPhoto[]; onNotice: (message: string | null) => void }) {
   const [items, setItems] = useState(photos);
   const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const lastToggled = useRef<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, startDelete] = useTransition();
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Mouse drags start after a few pixels (so clicks still work); touch needs a short press so scrolling isn't hijacked.
   const sensors = useSensors(
@@ -230,6 +244,48 @@ function SortableGrid({ slug, photos }: { slug: string; photos: AdminPhoto[] }) 
     });
   }
 
+  // Shift-clicking selects (or clears) everything between the last ticked photo and this one.
+  function toggle(id: string, shift: boolean) {
+    const anchor = lastToggled.current;
+    lastToggled.current = id;
+    setSelected((current) => {
+      const next = new Set(current);
+      const from = anchor ? items.findIndex((photo) => photo.id === anchor) : -1;
+      const to = items.findIndex((photo) => photo.id === id);
+      if (shift && from !== -1 && to !== -1) {
+        const select = !current.has(id);
+        for (let index = Math.min(from, to); index <= Math.max(from, to); index += 1) {
+          if (select) next.add(items[index].id);
+          else next.delete(items[index].id);
+        }
+      } else if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  function confirmBulkDelete() {
+    setDeleteError(null);
+    startDelete(async () => {
+      const result = await deletePhotosAction([...selected]);
+      if (!result.ok) {
+        setDeleteError(result.error);
+        return;
+      }
+      setConfirming(false);
+      setSelected(new Set());
+      const noun = result.deleted === 1 ? "photo" : "photos";
+      onNotice(
+        result.failedFiles > 0
+          ? `Deleted ${result.deleted} ${noun}. ${result.failedFiles} file(s) couldn\u2019t be removed from Cloudinary; they no longer appear on the site but may need deleting there.`
+          : `Deleted ${result.deleted} ${noun}.`,
+      );
+    });
+  }
+
   return (
     <>
       {error && <p className={styles.error}>{error}</p>}
@@ -238,16 +294,55 @@ function SortableGrid({ slug, photos }: { slug: string; photos: AdminPhoto[] }) 
         <SortableContext items={items.map((photo) => photo.id)} strategy={rectSortingStrategy}>
           <ul className={styles.grid}>
             {items.map((photo) => (
-              <PhotoCard key={photo.id} photo={photo} />
+              <PhotoCard
+                key={photo.id}
+                photo={photo}
+                selected={selected.has(photo.id)}
+                onToggle={(shift) => toggle(photo.id, shift)}
+              />
             ))}
           </ul>
         </SortableContext>
       </DndContext>
+      {selected.size > 0 && (
+        <div className={styles.selectionBar} role="region" aria-label="Selected photos">
+          <span className={styles.selectionCount}>{selected.size} selected</span>
+          <button type="button" className={styles.outline} onClick={() => setSelected(new Set(items.map((photo) => photo.id)))}>
+            Select all
+          </button>
+          <button type="button" className={styles.outline} onClick={() => setSelected(new Set())}>
+            Clear
+          </button>
+          <button
+            type="button"
+            className={styles.dangerSolid}
+            onClick={() => {
+              setDeleteError(null);
+              setConfirming(true);
+            }}
+          >
+            Delete {selected.size}
+          </button>
+        </div>
+      )}
+      <DeleteDialog
+        open={confirming}
+        title={`Delete ${selected.size} ${selected.size === 1 ? "photo" : "photos"}?`}
+        text="This permanently removes them from the gallery and from Cloudinary. It can’t be undone."
+        deleting={deleting}
+        error={deleteError}
+        onCancel={() => {
+          if (deleting) return;
+          setConfirming(false);
+          setDeleteError(null);
+        }}
+        onConfirm={confirmBulkDelete}
+      />
     </>
   );
 }
 
-function PhotoCard({ photo }: { photo: AdminPhoto }) {
+function PhotoCard({ photo, selected, onToggle }: { photo: AdminPhoto; selected: boolean; onToggle: (shift: boolean) => void }) {
   const [pending, startTransition] = useTransition();
   const { message, report } = useResult();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: photo.id });
@@ -270,9 +365,18 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
   return (
     <li
       ref={setNodeRef}
-      className={`${styles.card} ${isDragging ? styles.dragging : ""}`}
+      className={`${styles.card} ${isDragging ? styles.dragging : ""} ${selected ? styles.selected : ""}`}
       style={{ transform: CSS.Transform.toString(transform), transition }}
     >
+      <label className={styles.select}>
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={() => undefined}
+          onClick={(event) => onToggle(event.shiftKey)}
+          aria-label="Select photo"
+        />
+      </label>
       <div className={styles.handle} {...attributes} {...listeners} aria-label="Drag to reorder">
         {/* eslint-disable-next-line @next/next/no-img-element -- admin previews use Cloudinary resizing directly */}
         <img
@@ -332,7 +436,8 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
       </form>
       <DeleteDialog
         open={confirmingDelete}
-        photo={photo}
+        title="Delete this photo?"
+        text="This permanently removes it from the gallery and from Cloudinary. It can’t be undone."
         deleting={deleting}
         error={deleteError}
         onCancel={() => {
@@ -348,14 +453,15 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
 
 type DeleteDialogProps = {
   open: boolean;
-  photo: AdminPhoto;
+  title: string;
+  text: string;
   deleting: boolean;
   error: string | null;
   onCancel: () => void;
   onConfirm: () => void;
 };
 
-function DeleteDialog({ open, photo, deleting, error, onCancel, onConfirm }: DeleteDialogProps) {
+function DeleteDialog({ open, title, text, deleting, error, onCancel, onConfirm }: DeleteDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -379,18 +485,10 @@ function DeleteDialog({ open, photo, deleting, error, onCancel, onConfirm }: Del
         if (event.target === event.currentTarget) onCancel();
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- admin previews use Cloudinary resizing directly */}
-      <img
-        className={styles.dialogPreview}
-        src={photo.url.replace("/upload/", "/upload/f_auto,q_auto,c_fill,w_160,h_160/")}
-        alt=""
-      />
       <h2 id={titleId} className={styles.dialogTitle}>
-        Delete this photo?
+        {title}
       </h2>
-      <p className={styles.dialogText}>
-        This permanently removes it from the gallery and from Cloudinary. It can&rsquo;t be undone.
-      </p>
+      <p className={styles.dialogText}>{text}</p>
       {error && (
         <p className={styles.error} role="alert">
           {error}

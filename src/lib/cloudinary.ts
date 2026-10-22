@@ -68,5 +68,28 @@ export async function markImagesAttached(publicIds: string[]) {
 
 export async function destroyImages(publicIds: string[]) {
   if (publicIds.length === 0 || !configured()) return;
-  await cloudinary.api.delete_resources(publicIds, { resource_type: "image", type: "upload" });
+  await cloudinary.api.delete_resources(publicIds, { resource_type: "image", type: "upload", invalidate: true });
+}
+
+// Cloudinary deletes at most 100 files per call. Returns the ids that could not be removed, so callers can say so.
+const DELETE_BATCH_SIZE = 100;
+
+export async function destroyImagesInBatches(publicIds: string[]): Promise<string[]> {
+  if (publicIds.length === 0) return [];
+  if (!configured()) return publicIds;
+
+  const failed: string[] = [];
+  for (let start = 0; start < publicIds.length; start += DELETE_BATCH_SIZE) {
+    const batch = publicIds.slice(start, start + DELETE_BATCH_SIZE);
+    try {
+      const result = await cloudinary.api.delete_resources(batch, { resource_type: "image", type: "upload", invalidate: true });
+      for (const id of batch) {
+        const status = result.deleted?.[id];
+        if (status !== "deleted" && status !== "not_found") failed.push(id);
+      }
+    } catch {
+      failed.push(...batch);
+    }
+  }
+  return failed;
 }

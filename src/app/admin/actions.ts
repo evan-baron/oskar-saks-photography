@@ -6,7 +6,14 @@ import { z } from "zod";
 import { CATEGORIES } from "@/data/photos";
 import { verifyAdmin } from "@/lib/dal";
 import { db } from "@/lib/db";
-import { destroyImages, fetchUploadedImage, markImagesAttached, mediaUrl, signMediaUpload } from "@/lib/cloudinary";
+import {
+  destroyImages,
+  destroyImagesInBatches,
+  fetchUploadedImage,
+  markImagesAttached,
+  mediaUrl,
+  signMediaUpload,
+} from "@/lib/cloudinary";
 import { MAX_MEDIA_BYTES, MEDIA_FORMATS, MEDIA_PUBLIC_ID_PATTERN, mediaFolder } from "@/lib/media";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -100,6 +107,35 @@ export async function deletePhotoAction(id: string): Promise<ActionResult> {
   await destroyImages([photo.cloudinaryPublicId]).catch((error) => console.error("Failed to delete image:", error));
   updateTag("photos");
   return { ok: true };
+}
+
+export type BulkDeleteResult = { ok: true; deleted: number; failedFiles: number } | { ok: false; error: string };
+
+const bulkIdsSchema = z.array(z.string().min(1)).min(1).max(500);
+
+export async function deletePhotosAction(ids: string[]): Promise<BulkDeleteResult> {
+  await verifyAdmin();
+  const parsed = bulkIdsSchema.safeParse(ids);
+  if (!parsed.success) return { ok: false, error: "Select between 1 and 500 photos" };
+
+  const photos = await db.photo.findMany({ where: { id: { in: [...new Set(parsed.data)] } } });
+  if (photos.length === 0) return { ok: false, error: "Those photos no longer exist" };
+
+  // Rows first: if removing the files then fails, the worst case is an unused file in Cloudinary, not a broken image on the site.
+  await db.photo.deleteMany({ where: { id: { in: photos.map((photo) => photo.id) } } });
+
+  // A gallery that lost its cover gets the first remaining photo as its new one.
+  for (const category of new Set(photos.filter((photo) => photo.cover).map((photo) => photo.category))) {
+    if ((await db.photo.count({ where: { category, cover: true } })) > 0) continue;
+    const next = await db.photo.findFirst({ where: { category }, orderBy: { position: "asc" } });
+    if (next) await db.photo.update({ where: { id: next.id }, data: { cover: true } });
+  }
+
+  const failed = await destroyImagesInBatches(photos.map((photo) => photo.cloudinaryPublicId));
+  if (failed.length > 0) console.error("Failed to delete from Cloudinary:", failed);
+
+  updateTag("photos");
+  return { ok: true, deleted: photos.length, failedFiles: failed.length };
 }
 
 const copySchema = z.object({

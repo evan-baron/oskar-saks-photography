@@ -111,6 +111,7 @@
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: var(--color-surface);
@@ -259,13 +260,6 @@
   }
 }
 
-.dialogPreview {
-  width: 5rem;
-  height: 5rem;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-}
-
 .dialogTitle {
   font-family: var(--font-young-serif), serif;
   font-size: 1.25rem;
@@ -288,4 +282,67 @@
   letter-spacing: normal;
   text-transform: none;
   opacity: 0.8;
+}
+
+// Selection checkbox, top left of the photo (the move icon is top right).
+.manager .select {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+
+  input {
+    appearance: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0;
+    cursor: pointer;
+    background: hsla(218, 45%, 14%, 0.55);
+    border: 2px solid #fff;
+    border-radius: 0.4rem;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+
+    &:checked {
+      background: var(--color-accent-deep) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 1rem no-repeat;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent-deep);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.selected {
+  outline: 3px solid var(--color-accent-deep);
+  outline-offset: -3px;
+}
+
+.selectionBar {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-inline: auto;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  border-radius: 999px;
+  box-shadow: var(--shadow-lift);
+}
+
+.selectionCount {
+  margin-right: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
