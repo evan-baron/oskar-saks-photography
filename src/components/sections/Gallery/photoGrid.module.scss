@@ -1,18 +1,104 @@
 @use '@/styles/mixins' as *;
 
-// Three equal-width columns; photos keep their own shape and stack, so column bottoms are close but not identical.
+// Viewing style: the viewer's choice of 3, 5 or 7 columns, offered on very wide screens only (see WIDE_COLUMNS_FROM).
+.viewing {
+	display: none;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 0.4rem;
+	margin-bottom: 1.25rem;
+
+	@include from(1800px) {
+		display: flex;
+	}
+}
+
+.viewingLabel {
+	margin-right: 0.35rem;
+	font-family: var(--font-mono);
+	font-size: 0.7rem;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--color-text-dim);
+}
+
+.viewingOption,
+.viewingActive {
+	display: grid;
+	place-items: center;
+	width: 2.5rem;
+	height: 2.25rem;
+	color: var(--color-text-dim);
+	border: 1px solid var(--color-line);
+	border-radius: var(--radius-sm);
+	cursor: pointer;
+	transition:
+		color 0.3s ease,
+		background-color 0.3s ease,
+		border-color 0.3s ease;
+}
+
+.viewingOption {
+	@include hover {
+		color: var(--color-text);
+		border-color: var(--color-text-dim);
+	}
+}
+
+.viewingActive {
+	color: #fff;
+	background: var(--color-accent-deep);
+	border-color: var(--color-accent-deep);
+}
+
+// Equal-width columns (3, 5 or 7); photos keep their own shape and stack, so column bottoms are close but not identical.
+// Several layouts can be in the page at once; only one is displayed (see the rules below the block).
 .masonry {
 	--gap: 1rem;
 	display: none;
 	align-items: flex-start;
 	gap: var(--gap);
 
-	@include from($bp-md) {
-		display: flex;
-	}
-
 	@include from($bp-lg) {
 		--gap: 1.5rem;
+	}
+
+	// Narrow columns get tighter gaps and smaller captions.
+	&[data-columns='5'] {
+		--gap: 0.75rem;
+
+		@include from($bp-lg) {
+			--gap: 1rem;
+		}
+	}
+
+	&[data-columns='7'] {
+		--gap: 0.5rem;
+
+		@include from($bp-lg) {
+			--gap: 0.65rem;
+		}
+	}
+}
+
+// Which layout shows. Before hydration ("auto") the width decides: 3 columns below WIDE_COLUMNS_FROM, 5 from it.
+// Afterwards the layout in use is named explicitly. Below $bp-md the single-column deck replaces all of them.
+@include from($bp-md) {
+	.layouts[data-view='auto'] .masonry[data-columns='3'],
+	.layouts[data-view='3'] .masonry[data-columns='3'],
+	.layouts[data-view='5'] .masonry[data-columns='5'],
+	.layouts[data-view='7'] .masonry[data-columns='7'] {
+		display: flex;
+	}
+}
+
+@include from(1800px) {
+	.layouts[data-view='auto'] .masonry[data-columns='3'] {
+		display: none;
+	}
+
+	.layouts[data-view='auto'] .masonry[data-columns='5'] {
+		display: flex;
 	}
 }
 
@@ -110,6 +196,18 @@
 	@include from($bp-lg) {
 		padding: 1.25rem;
 	}
+}
+
+.masonry[data-columns='5'] .name {
+	font-size: 1.2rem;
+}
+
+.masonry[data-columns='7'] .name {
+	font-size: 0.95rem;
+}
+
+.masonry[data-columns='7'] .overlay {
+	padding: 0.5rem;
 }
 
 .name {

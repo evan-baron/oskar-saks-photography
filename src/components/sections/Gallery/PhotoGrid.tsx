@@ -13,7 +13,8 @@ import FadeImage from "@/components/ui/FadeImage/FadeImage";
 import Lightbox from "@/components/ui/Lightbox/Lightbox";
 import Reveal from "@/components/ui/Reveal/Reveal";
 import type { Photo } from "@/data/photos";
-import { buildColumns, COLUMNS, columnsForWidth } from "@/lib/galleryLayout";
+import { currentColumns, subscribeToColumns, writeColumns } from "@/lib/galleryColumns";
+import { buildColumns, COLUMN_OPTIONS, DEFAULT_COLUMNS, NARROW_COLUMNS, WIDE_COLUMNS_FROM, type ColumnCount } from "@/lib/galleryLayout";
 import styles from "./photoGrid.module.scss";
 
 type PhotoGridProps = {
@@ -74,20 +75,53 @@ function Tile({ photo, number, sizes, delay = 0, transitionName, preload = false
 
 const MIN_CARD_RATIO = 0.8;
 
-// The column count follows the screen width. The server renders the default; wide screens update after hydration.
-function subscribeToResize(onChange: () => void) {
-  window.addEventListener("resize", onChange);
-  return () => window.removeEventListener("resize", onChange);
+// The viewer picks the column count. The server renders the default; a saved choice applies after hydration.
+const serverColumnCount = () => DEFAULT_COLUMNS;
+
+// The viewing styles only exist on wide screens; anything narrower is always three columns.
+const WIDE_QUERY = `(min-width: ${WIDE_COLUMNS_FROM}px)`;
+function subscribeToWide(onChange: () => void) {
+  const query = window.matchMedia(WIDE_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
 }
-const currentColumnCount = () => columnsForWidth(window.innerWidth);
-const serverColumnCount = () => COLUMNS;
+const currentlyWide = () => window.matchMedia(WIDE_QUERY).matches;
+const serverWide = () => false;
+
+// False while hydrating, true from the first client render after.
+const subscribeToNothing = () => () => undefined;
+
+function ColumnIcon({ count }: { count: ColumnCount }) {
+  const gap = 1.5;
+  const width = (20 - gap * (count - 1)) / count;
+  return (
+    <svg viewBox="0 0 20 16" width="20" height="16" fill="currentColor" aria-hidden="true">
+      {Array.from({ length: count }, (_, index) => (
+        <rect key={index} x={index * (width + gap)} y="1" width={width} height="14" rx="0.6" />
+      ))}
+    </svg>
+  );
+}
 
 export default function PhotoGrid({ photos }: PhotoGridProps) {
-  const columnCount = useSyncExternalStore(subscribeToResize, currentColumnCount, serverColumnCount);
-  // Changing the column count moves photos between columns, so the name includes it: the old and new copies of a
-  // photo never share a transition name while both exist.
+  const chosenColumns = useSyncExternalStore(subscribeToColumns, currentColumns, serverColumnCount);
+  const wide = useSyncExternalStore(subscribeToWide, currentlyWide, serverWide);
+  const hydrated = useSyncExternalStore(subscribeToNothing, () => true, () => false);
+  const columnCount = wide ? chosenColumns : NARROW_COLUMNS;
+  // Each layout's tiles carry transition names that include its column count, so no two layouts ever share a name.
   const rowTransitionName = `photo-row${columnCount}`;
-  const columns = useMemo(() => buildColumns(photos, columnCount), [photos, columnCount]);
+  // The control only shows on wide screens, where the default is what the server-rendered page is showing.
+  const shownColumns = hydrated ? columnCount : DEFAULT_COLUMNS;
+  // The server can't know the screen width, so it sends the 3-column layout (under WIDE_COLUMNS_FROM) and the 5-column one
+  // (from it) together and CSS shows the right one: the page is correct from the first paint. After hydration the layout
+  // the viewer actually has takes over, and a 7-column choice is added to the page only when it is made.
+  const layouts = useMemo(
+    () =>
+      [...new Set<number>([NARROW_COLUMNS, DEFAULT_COLUMNS, ...(hydrated ? [columnCount] : [])])]
+        .sort((a, b) => a - b)
+        .map((count) => ({ count, columns: buildColumns(photos, count) })),
+    [photos, columnCount, hydrated],
+  );
   const numbers = useMemo(() => new Map(photos.map((photo, index) => [photo.id, index + 1])), [photos]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [openedId, setOpenedId] = useState<string | null>(null);
@@ -132,21 +166,43 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
 
   return (
     <>
-      <div className={styles.masonry}>
-        {columns.map((column, columnIndex) => (
-          <div key={columnIndex} className={styles.column}>
-            {column.map((photo, itemIndex) => (
-              <Tile
-                key={photo.id}
-                photo={photo}
-                number={numbers.get(photo.id) ?? 0}
-                sizes={`${Math.round(100 / columnCount)}vw`}
-                delay={itemIndex * 60}
-                transitionName={rowTransitionName}
-                lightboxOpen={openedId === photo.id}
-                preload={itemIndex === 0}
-                onOpen={openPhoto}
-              />
+      <div className={styles.viewing} role="radiogroup" aria-label="Viewing style">
+        <span className={styles.viewingLabel}>View</span>
+        {COLUMN_OPTIONS.map((option) => (
+          <button
+            key={option}
+            type="button"
+            role="radio"
+            aria-checked={shownColumns === option}
+            aria-label={`${option} columns`}
+            title={`${option} columns`}
+            className={shownColumns === option ? styles.viewingActive : styles.viewingOption}
+            onClick={() => writeColumns(option)}
+          >
+            <ColumnIcon count={option} />
+          </button>
+        ))}
+      </div>
+
+      <div className={styles.layouts} data-view={hydrated ? columnCount : "auto"}>
+        {layouts.map(({ count, columns }) => (
+          <div key={count} className={styles.masonry} data-columns={count}>
+            {columns.map((column, columnIndex) => (
+              <div key={columnIndex} className={styles.column}>
+                {column.map((photo, itemIndex) => (
+                  <Tile
+                    key={photo.id}
+                    photo={photo}
+                    number={numbers.get(photo.id) ?? 0}
+                    sizes={`${Math.round(100 / count)}vw`}
+                    delay={itemIndex * 60}
+                    transitionName={`photo-row${count}`}
+                    lightboxOpen={openedId === photo.id}
+                    preload={itemIndex === 0}
+                    onOpen={openPhoto}
+                  />
+                ))}
+              </div>
             ))}
           </div>
         ))}

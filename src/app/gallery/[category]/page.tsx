@@ -50,7 +50,7 @@ async function CategoryContent({ params }: { params: PageProps<"/gallery/[catego
         lede={category.description}
         back={{ href: "/gallery", label: "All galleries" }}
       />
-      <div className={styles.body}>
+      <div className={`${styles.body} ${styles.bodyWide}`}>
         <PhotoGrid photos={photos} />
       </div>
       {others.length > 0 && (

@@ -1,25 +1,22 @@
 type Layoutable = { width: number; height: number };
 
-export const COLUMNS = 3;
+// Column counts the viewer can pick between in the gallery's "viewing style" control.
+export const COLUMN_OPTIONS = [3, 5, 7] as const;
+export type ColumnCount = (typeof COLUMN_OPTIONS)[number];
+export const DEFAULT_COLUMNS: ColumnCount = 5;
 
-// More columns on very wide screens. Keep these widths in sync with the matching media queries in
-// categoryPage.module.scss, which lets the gallery span the full screen from the first one.
+// Below this width the gallery is always three columns and the control is hidden. Keep it in sync with the matching
+// media queries in photoGrid.module.scss and categoryPage.module.scss (.bodyWide).
 export const WIDE_COLUMNS_FROM = 1800;
-export const ULTRAWIDE_COLUMNS_FROM = 2400;
-
-export function columnsForWidth(width: number) {
-  if (width >= ULTRAWIDE_COLUMNS_FROM) return 5;
-  if (width >= WIDE_COLUMNS_FROM) return 4;
-  return COLUMNS;
-}
+export const NARROW_COLUMNS: ColumnCount = 3;
 
 // Approximate gap between stacked photos, as a fraction of column width, so column heights stay balanced.
 const GAP_ALLOWANCE = 0.03;
 
-// Masonry (three columns by default): every photo fills its column's width at its natural shape (nothing is cropped), and each photo goes
+// Masonry (the column count is the viewer's choice): every photo fills its column's width at its natural shape (nothing is cropped), and each photo goes
 // into whichever column is currently shortest. That keeps the column bottoms close together while the photos
 // still read in order, left to right and top to bottom.
-export function buildColumns<T extends Layoutable>(photos: T[], count = COLUMNS): T[][] {
+export function buildColumns<T extends Layoutable>(photos: T[], count: number = DEFAULT_COLUMNS): T[][] {
   const columns: T[][] = Array.from({ length: count }, () => []);
   const heights = new Array<number>(count).fill(0);
   for (const photo of photos) {
