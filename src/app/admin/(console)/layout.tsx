@@ -2,6 +2,7 @@ import { Suspense, ViewTransition, type ReactNode } from "react";
 import Link from "next/link";
 import { verifyAdmin } from "@/lib/dal";
 import { logout } from "@/app/login/actions";
+import AdminSkeleton from "@/components/admin/AdminSkeleton/AdminSkeleton";
 import AdminNav from "@/components/admin/AdminNav/AdminNav";
 import styles from "../admin.module.scss";
 
@@ -10,7 +11,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     // Data refreshes after uploads and edits shouldn't animate (and the browser aborts transitions in hidden tabs).
     <ViewTransition default="none">
       <div className={styles.page}>
-        <Suspense fallback={<p className={styles.loading}>Loading…</p>}>
+        <Suspense fallback={<AdminSkeleton variant="header" />}>
           <AdminHeader />
         </Suspense>
         <AdminNav />

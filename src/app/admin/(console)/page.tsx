@@ -1,11 +1,10 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { CATEGORIES } from "@/data/photos";
+import AdminSkeleton from "@/components/admin/AdminSkeleton/AdminSkeleton";
 import { verifyAdmin } from "@/lib/dal";
 import { db } from "@/lib/db";
 import PhotoManager from "@/components/admin/PhotoManager/PhotoManager";
-
-import styles from "../admin.module.scss";
 
 export const metadata: Metadata = {
   title: "Galleries | Admin",
@@ -44,7 +43,7 @@ async function AdminGalleriesContent() {
 
 export default function AdminGalleriesPage() {
   return (
-    <Suspense fallback={<p className={styles.loading}>Loading…</p>}>
+    <Suspense fallback={<AdminSkeleton variant="gallery" />}>
       <AdminGalleriesContent />
     </Suspense>
   );

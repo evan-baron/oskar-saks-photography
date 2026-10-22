@@ -4,6 +4,7 @@ import { DM_Mono, Young_Serif, Schibsted_Grotesk } from "next/font/google";
 import Header from "@/components/layout/Header/Header";
 import ContactSection from "@/components/sections/Contact/ContactSection";
 import Footer from "@/components/layout/Footer/Footer";
+import HideOnAdmin from "@/components/layout/HideOnAdmin/HideOnAdmin";
 import AdminShortcut from "@/components/layout/AdminShortcut/AdminShortcut";
 import {
   PHOTOGRAPHER,
@@ -69,7 +70,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ViewTransition>
           <main>{children}</main>
         </ViewTransition>
-        <ContactSection />
+        <HideOnAdmin>
+          <ContactSection />
+        </HideOnAdmin>
         <Footer />
         <Suspense fallback={null}>
           <AdminShortcut />

@@ -1,10 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import AdminSkeleton from "@/components/admin/AdminSkeleton/AdminSkeleton";
 import { verifyAdmin } from "@/lib/dal";
 import { getHomeContent } from "@/lib/siteContent";
 import HomeEditor from "@/components/admin/ContentEditor/HomeEditor";
-
-import styles from "../../admin.module.scss";
 
 export const metadata: Metadata = {
   title: "Home | Admin",
@@ -18,7 +17,7 @@ async function AdminHomeContent() {
 
 export default function AdminHomePage() {
   return (
-    <Suspense fallback={<p className={styles.loading}>Loading…</p>}>
+    <Suspense fallback={<AdminSkeleton variant="form" />}>
       <AdminHomeContent />
     </Suspense>
   );
