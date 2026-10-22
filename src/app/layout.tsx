@@ -1,9 +1,10 @@
-import { ViewTransition } from "react";
+import { Suspense, ViewTransition } from "react";
 import type { Metadata, Viewport } from "next";
 import { DM_Mono, Young_Serif, Schibsted_Grotesk } from "next/font/google";
 import Header from "@/components/layout/Header/Header";
 import Contact from "@/components/sections/Contact/Contact";
 import Footer from "@/components/layout/Footer/Footer";
+import AdminShortcut from "@/components/layout/AdminShortcut/AdminShortcut";
 import {
   PHOTOGRAPHER,
   SITE_DESCRIPTION,
@@ -70,6 +71,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </ViewTransition>
         <Contact />
         <Footer />
+        <Suspense fallback={null}>
+          <AdminShortcut />
+        </Suspense>
       </body>
     </html>
   );
