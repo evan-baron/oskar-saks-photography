@@ -52,17 +52,27 @@
 	}
 }
 
+// Full width, not the page's centred container: the logo stays in the left corner of the screen and the nav is centred on the
+// screen itself (the outer columns are equal, so the middle one is centred whatever the logo's width), with the menu button
+// on the right when the nav collapses. The side padding matches a full-width gallery's.
 .bar {
-	@include container;
+	width: 100%;
+	padding-inline: var(--gutter);
 	height: var(--header-height);
-	display: flex;
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
 	align-items: center;
-	justify-content: space-between;
 	position: relative;
 	z-index: 2;
+
+	@include from(1800px) {
+		padding-inline: 4rem;
+	}
 }
 
 .brand {
+	grid-column: 1;
+	justify-self: start;
 	display: block;
 	line-height: 0;
 	margin-block: -0.25rem;
@@ -79,6 +89,7 @@
 }
 
 .desktopNav {
+	grid-column: 2;
 	display: none;
 
 	@include from(900px) {
@@ -185,6 +196,8 @@
 }
 
 .toggle {
+	grid-column: 3;
+	justify-self: end;
 	display: inline-flex;
 	align-items: center;
 	gap: 0.85rem;
