@@ -29,10 +29,13 @@ export function useActiveSection() {
       frame = 0;
       // Looked up each time: a page's sections can finish streaming in after the route changes.
       const nodes = SECTIONS.map((id) => ({ id, node: document.getElementById(id) })).filter(
-        (entry): entry is { id: SectionId; node: HTMLElement } => entry.node !== null,
+        // Pages visited earlier stay in the document, hidden (display: none); only sections that are laid out count.
+        (entry): entry is { id: SectionId; node: HTMLElement } => entry.node !== null && entry.node.getClientRects().length > 0,
       );
       const line = window.innerHeight * READING_LINE;
-      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      // Only counts when the page actually scrolls: a short page that fits on screen is "at the bottom" from the start.
+      const atBottom =
+        window.scrollY > 0 && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
       // The last section whose top is above the line; at the very bottom, the last section, even if it is too short to reach it.
       const passed = nodes.filter(({ node }) => node.getBoundingClientRect().top <= line);
       const current = atBottom ? nodes.at(-1) : passed.at(-1);
@@ -43,9 +46,14 @@ export function useActiveSection() {
     };
 
     update();
+    // Navigating between pages swaps the content without a scroll event, so the sections found a moment ago may belong to the
+    // page that just left. Recheck whenever the page's elements are added or removed.
+    const mutations = new MutationObserver(schedule);
+    mutations.observe(document.body, { childList: true, subtree: true });
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
+      mutations.disconnect();
       if (frame) window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
