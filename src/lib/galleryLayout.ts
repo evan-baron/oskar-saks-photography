@@ -1,7 +1,7 @@
 type Layoutable = { width: number; height: number };
 
 // Column counts the viewer can pick between in the gallery's "viewing style" control.
-export const COLUMN_OPTIONS = [3, 5, 7] as const;
+export const COLUMN_OPTIONS = [2, 3, 5, 7] as const;
 export type ColumnCount = (typeof COLUMN_OPTIONS)[number];
 export const DEFAULT_COLUMNS: ColumnCount = 5;
 

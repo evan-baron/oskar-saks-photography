@@ -1,6 +1,6 @@
 @use '@/styles/mixins' as *;
 
-// Viewing style: the viewer's choice of 3, 5 or 7 columns, offered on very wide screens only (see WIDE_COLUMNS_FROM).
+// Viewing style: the viewer's choice of 2, 3, 5 or 7 columns, offered on very wide screens only (see WIDE_COLUMNS_FROM).
 .viewing {
 	display: none;
 	align-items: center;
@@ -51,7 +51,7 @@
 	border-color: var(--color-accent-deep);
 }
 
-// Equal-width columns (3, 5 or 7); photos keep their own shape and stack, so column bottoms are close but not identical.
+// Equal-width columns (2, 3, 5 or 7); photos keep their own shape and stack, so column bottoms are close but not identical.
 // Several layouts can be in the page at once; only one is displayed (see the rules below the block).
 .masonry {
 	--gap: 1rem;
@@ -85,6 +85,7 @@
 // Afterwards the layout in use is named explicitly. Below $bp-md the single-column deck replaces all of them.
 @include from($bp-md) {
 	.layouts[data-view='auto'] .masonry[data-columns='3'],
+	.layouts[data-view='2'] .masonry[data-columns='2'],
 	.layouts[data-view='3'] .masonry[data-columns='3'],
 	.layouts[data-view='5'] .masonry[data-columns='5'],
 	.layouts[data-view='7'] .masonry[data-columns='7'] {
