@@ -3,12 +3,13 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import Reveal from "@/components/ui/Reveal/Reveal";
-import { PHOTOS } from "@/data/photos";
+import type { Photo } from "@/data/photos";
 import { PRINTS } from "@/data/store";
 import { prefillContact } from "@/lib/contactPrefill";
 import styles from "./store.module.scss";
 
-export default function Store() {
+// `photos` are the gallery photos the prints are made from, matched to each print by `photoId`.
+export default function Store({ photos }: { photos: Photo[] }) {
   return (
     <section id="store" className={styles.store} aria-labelledby="store-title">
       <div className={styles.inner}>
@@ -29,7 +30,7 @@ export default function Store() {
 
         <ul className={styles.grid}>
           {PRINTS.map((print, index) => {
-            const photo = PHOTOS.find((item) => item.id === print.photoId);
+            const photo = photos.find((item) => item.id === print.photoId);
             if (!photo) return null;
             return (
               <Reveal as="li" key={print.id} delay={(index % 2) * 100} className={styles.card}>
