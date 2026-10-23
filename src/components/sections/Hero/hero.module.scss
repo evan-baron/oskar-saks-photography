@@ -17,6 +17,10 @@
 	inset: 0 0 32% 0;
 	z-index: -1;
 	clip-path: inset(14svh 7vw 22svh 7vw round 2.5rem);
+	// The shade fades to a flat --color-bg, but the body behind is a slow gradient that has already drifted darker by here.
+	// Fading the frame itself out at the bottom lets the photo dissolve into whatever the page colour is.
+	-webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+	mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
 	animation: expand 1.9s var(--ease-out) 0.15s forwards;
 
 	@include from($bp-md) {
