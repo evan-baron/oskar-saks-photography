@@ -4,6 +4,10 @@
 	position: fixed;
 	inset: 0 0 auto 0;
 	z-index: 100;
+	// During a page transition the browser draws each named element in its own layer above the rest of the page. Without a name,
+	// the header is part of the page's bottom layer, so the page's content (the hero photo) is drawn over it. Naming it keeps it
+	// on top; see the site-header rules in globals.scss.
+	view-transition-name: site-header;
 	transition:
 		background-color 0.4s ease,
 		transform 0.5s var(--ease-out);

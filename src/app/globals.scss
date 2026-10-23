@@ -123,6 +123,7 @@ button {
 		position: fixed;
 		inset: 0 0 auto 0;
 		z-index: 200;
+		view-transition-name: scroll-progress;
 		height: 2px;
 		background: var(--gradient-accent);
 		transform: scaleX(0);
@@ -177,6 +178,27 @@ button {
 		transition-duration: 0.01ms !important;
 		transition-delay: 0s !important;
 	}
+}
+
+// Fixed site chrome (the header, the admin button, the scroll-progress bar) is its own layer during transitions. Unnamed, it
+// belongs to the page's bottom layer and the page's content, which the browser draws as a separate layer above it, covers it
+// for the length of the transition. It never animates: it is the same before and after.
+::view-transition-group(site-header),
+::view-transition-group(admin-shortcut),
+::view-transition-group(scroll-progress) {
+	animation: none;
+}
+
+::view-transition-old(site-header),
+::view-transition-old(admin-shortcut),
+::view-transition-old(scroll-progress) {
+	display: none;
+}
+
+::view-transition-new(site-header),
+::view-transition-new(admin-shortcut),
+::view-transition-new(scroll-progress) {
+	animation: none;
 }
 
 // Gallery thumbnail <-> lightbox shared-element morph.

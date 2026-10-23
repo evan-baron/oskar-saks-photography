@@ -5,6 +5,8 @@
   right: max(1.25rem, env(safe-area-inset-right));
   bottom: max(1.25rem, env(safe-area-inset-bottom));
   z-index: 250;
+  // Its own layer during page transitions, so the page's content isn't drawn over it (see the rules in globals.scss).
+  view-transition-name: admin-shortcut;
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
