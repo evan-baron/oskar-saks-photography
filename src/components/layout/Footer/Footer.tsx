@@ -76,11 +76,23 @@ export default async function Footer() {
 						<span className={styles.handle}>@{instagram}</span>
 					</a>
 				</div>
-				<p className={styles.legal}>
-					&copy; {COPYRIGHT_YEAR} {PHOTOGRAPHER}. All photographs are protected
-					by copyright.
-				</p>
+				<div className={styles.legalBlock}>
+					<p className={styles.legal}>
+						&copy; {COPYRIGHT_YEAR} {PHOTOGRAPHER}. All photographs are protected
+						by copyright.
+					</p>
+					<p className={styles.credit}>
+						Website by{' '}
+						<a
+							href='https://www.retconconsulting.com'
+							target='_blank'
+							rel='noopener'
+						>
+							Retcon Consulting
+						</a>
+					</p>
+				</div>
 			</div>
-		</footer>
-	);
+			</footer>
+		);
 }
