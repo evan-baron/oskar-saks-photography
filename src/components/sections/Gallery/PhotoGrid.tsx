@@ -40,6 +40,7 @@ function Tile({ photo, number, sizes, delay = 0, transitionName, preload = false
       alt={photo.alt}
       fill
       sizes={sizes}
+      quality={90}
       preload={preload}
       className={styles.image}
     />
@@ -159,6 +160,7 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
       alt={photo.alt}
       fill
       sizes="calc(100vw - 2.5rem)"
+      quality={90}
       preload={index === 0}
       className={styles.cardImage}
     />
