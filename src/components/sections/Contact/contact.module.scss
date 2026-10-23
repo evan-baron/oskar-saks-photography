@@ -231,6 +231,12 @@
 	justify-content: space-between;
 	min-height: 3.75rem;
 
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+
 	@include from($bp-md) {
 		width: auto;
 		align-self: flex-start;

@@ -6,6 +6,9 @@ import { CONTACT_PREFILL_EVENT, type ContactPrefill } from "@/lib/contactPrefill
 import { instagramUrl } from "@/lib/siteConfig";
 import styles from "./contact.module.scss";
 
+// Flip to true once the Resend API key is set up (see /api/contact).
+const FORM_ENABLED = false;
+
 type Status = "idle" | "sending" | "sent" | "error";
 
 type ContactProps = {
@@ -222,8 +225,8 @@ export default function Contact({ topics, content }: ContactProps) {
                 </p>
               )}
 
-              <button type="submit" className={styles.submit} disabled={status === "sending"}>
-                <span>{status === "sending" ? "Sending…" : "Send message"}</span>
+              <button type="submit" className={styles.submit} disabled={!FORM_ENABLED || status === "sending"}>
+                <span>{status === "sending" ? "Sending…" : FORM_ENABLED ? "Send message" : "Coming soon"}</span>
                 <span aria-hidden="true">→</span>
               </button>
             </form>
