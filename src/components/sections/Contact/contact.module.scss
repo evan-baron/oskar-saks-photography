@@ -38,7 +38,13 @@
 }
 
 .details {
+	// Mobile: just the form; the email, Instagram and location only show from $bp-md.
+	display: none;
 	margin-top: 1rem;
+
+	@include from($bp-md) {
+		display: block;
+	}
 
 	// Mobile: the label sits above its value, so a long address like the email gets the full width instead of wrapping mid-word
 	// beside a label column. From $bp-md they sit side by side.
