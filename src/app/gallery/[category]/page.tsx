@@ -6,6 +6,7 @@ import PageHero from "@/components/ui/PageHero/PageHero";
 import PhotoGrid from "@/components/sections/Gallery/PhotoGrid";
 import { CATEGORIES } from "@/data/photos";
 import { getCategoryContent, getPhotosByCategory } from "@/lib/gallery";
+import { pageMetadata } from "@/lib/seo";
 import styles from "@/components/sections/Gallery/categoryPage.module.scss";
 
 export function generateStaticParams() {
@@ -16,10 +17,7 @@ export async function generateMetadata({ params }: PageProps<"/gallery/[category
   const { category: slug } = await params;
   const category = await getCategoryContent(slug);
   if (!category) return {};
-  return {
-    title: `${category.label} Gallery`,
-    description: category.description,
-  };
+  return pageMetadata({ title: `${category.label} Gallery`, description: category.description, path: `/gallery/${category.slug}` });
 }
 
 export default function CategoryPage({ params }: PageProps<"/gallery/[category]">) {

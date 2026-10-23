@@ -2,7 +2,7 @@ export const SITE_NAME = "Oskar Saks Photography";
 export const PHOTOGRAPHER = "Oskar Saks";
 export const SITE_TAGLINE = "Authentic moments, beautiful light, and memories that last a lifetime.";
 export const SITE_DESCRIPTION =
-  "Oskar Saks is a photographer photographing families and couples in Colorado. Browse the galleries, order prints, and book a session.";
+  "Oskar Saks is a Denver photographer capturing families, couples, and events across Colorado. Browse the galleries and book a session.";
 export const CONTACT_EMAIL = "oskarsaksphoto@gmail.com";
 // Username only, without the @. Contact details are editable in the admin; these are the defaults.
 export const INSTAGRAM_HANDLE = "oskarsaksphoto";
@@ -21,6 +21,13 @@ export const NAV_LINKS = [
 
 export type SectionId = (typeof NAV_LINKS)[number]["id"];
 
+// The address people reach the site at. oskarsaksphoto.com redirects (308) to the www host, so www is the canonical one that
+// canonical links, the sitemap and share images must use.
+const PRODUCTION_URL = "https://www.oskarsaksphoto.com";
+
+// NEXT_PUBLIC_SITE_URL overrides it (e.g. to test another domain); otherwise production builds use the real site and local
+// development uses localhost.
 export function getSiteUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
+  return process.env.NODE_ENV === "production" ? PRODUCTION_URL : "http://localhost:3000";
 }
