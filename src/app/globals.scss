@@ -42,12 +42,11 @@
 	@include from($bp-md) {
 		--header-height: 6.75rem;
 		--gutter: 2.5rem;
-		--section-space: 8rem;
+		--section-space: 5rem;
 	}
 
 	@include from($bp-xl) {
 		--gutter: 4rem;
-		--section-space: 10rem;
 	}
 }
 
