@@ -1,6 +1,6 @@
 @use '@/styles/mixins' as *;
 
-// Viewing style: the viewer's choice of 2, 3, 5 or 7 columns, offered on very wide screens only (see WIDE_COLUMNS_FROM).
+// Viewing style: the viewer's choice of 2, 3, 5 or 7 columns, 2 and 3 from tablet width up, 5 and 7 as well on very wide screens (see WIDE_COLUMNS_FROM).
 .viewing {
 	display: none;
 	align-items: center;
@@ -8,7 +8,7 @@
 	gap: 0.4rem;
 	margin-bottom: 1.25rem;
 
-	@include from(1800px) {
+	@include from($bp-md) {
 		display: flex;
 	}
 }

@@ -5,10 +5,11 @@ export const COLUMN_OPTIONS = [2, 3, 5, 7] as const;
 export type ColumnCount = (typeof COLUMN_OPTIONS)[number];
 export const DEFAULT_COLUMNS: ColumnCount = 5;
 
-// Below this width the gallery is always three columns and the control is hidden. Keep it in sync with the matching
-// media queries in photoGrid.module.scss and categoryPage.module.scss (.bodyWide).
+// Below this width the control only offers two or three columns (three by default); 5 and 7 need the extra room. Keep it in
+// sync with the matching media queries in photoGrid.module.scss and categoryPage.module.scss (.bodyWide).
 export const WIDE_COLUMNS_FROM = 1800;
 export const NARROW_COLUMNS: ColumnCount = 3;
+export const NARROW_OPTIONS: readonly ColumnCount[] = [2, 3];
 
 // Approximate gap between stacked photos, as a fraction of column width, so column heights stay balanced.
 const GAP_ALLOWANCE = 0.03;

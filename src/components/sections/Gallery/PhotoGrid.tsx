@@ -14,7 +14,7 @@ import Lightbox from "@/components/ui/Lightbox/Lightbox";
 import Reveal from "@/components/ui/Reveal/Reveal";
 import type { Photo } from "@/data/photos";
 import { currentColumns, subscribeToColumns, writeColumns } from "@/lib/galleryColumns";
-import { buildColumns, COLUMN_OPTIONS, DEFAULT_COLUMNS, NARROW_COLUMNS, WIDE_COLUMNS_FROM, type ColumnCount } from "@/lib/galleryLayout";
+import { buildColumns, COLUMN_OPTIONS, DEFAULT_COLUMNS, NARROW_COLUMNS, NARROW_OPTIONS, WIDE_COLUMNS_FROM, type ColumnCount } from "@/lib/galleryLayout";
 import styles from "./photoGrid.module.scss";
 
 type PhotoGridProps = {
@@ -79,7 +79,7 @@ const MIN_CARD_RATIO = 0.8;
 // The viewer picks the column count. The server renders the default; a saved choice applies after hydration.
 const serverColumnCount = () => DEFAULT_COLUMNS;
 
-// The viewing styles only exist on wide screens; anything narrower is always three columns.
+// Five and seven columns only exist on wide screens; anything narrower chooses between two and three.
 const WIDE_QUERY = `(min-width: ${WIDE_COLUMNS_FROM}px)`;
 function subscribeToWide(onChange: () => void) {
   const query = window.matchMedia(WIDE_QUERY);
@@ -108,11 +108,13 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
   const chosenColumns = useSyncExternalStore(subscribeToColumns, currentColumns, serverColumnCount);
   const wide = useSyncExternalStore(subscribeToWide, currentlyWide, serverWide);
   const hydrated = useSyncExternalStore(subscribeToNothing, () => true, () => false);
-  const columnCount = wide ? chosenColumns : NARROW_COLUMNS;
+  // A saved 5 or 7 doesn't fit a narrower screen; it falls back to the narrow default.
+  const columnCount = wide || NARROW_OPTIONS.includes(chosenColumns) ? chosenColumns : NARROW_COLUMNS;
+  const options = wide ? COLUMN_OPTIONS : NARROW_OPTIONS;
   // Each layout's tiles carry transition names that include its column count, so no two layouts ever share a name.
   const rowTransitionName = `photo-row${columnCount}`;
-  // The control only shows on wide screens, where the default is what the server-rendered page is showing.
-  const shownColumns = hydrated ? columnCount : DEFAULT_COLUMNS;
+  // Before hydration the server-rendered page is showing the narrow default (or the wide one, from WIDE_COLUMNS_FROM).
+  const shownColumns = hydrated ? columnCount : NARROW_COLUMNS;
   // The server can't know the screen width, so it sends the 3-column layout (under WIDE_COLUMNS_FROM) and the 5-column one
   // (from it) together and CSS shows the right one: the page is correct from the first paint. After hydration the layout
   // the viewer actually has takes over, and a 7-column choice is added to the page only when it is made.
@@ -170,7 +172,7 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
     <>
       <div className={styles.viewing} role="radiogroup" aria-label="Viewing style">
         <span className={styles.viewingLabel}>View</span>
-        {COLUMN_OPTIONS.map((option) => (
+        {options.map((option) => (
           <button
             key={option}
             type="button"
