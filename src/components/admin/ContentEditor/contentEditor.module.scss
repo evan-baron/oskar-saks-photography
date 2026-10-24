@@ -1,207 +1,208 @@
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.75rem;
 
-  label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-text-dim);
-  }
+	label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+		font-family: var(--font-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--color-text-dim);
+	}
 
-  input,
-  textarea {
-    padding: 0.6rem 0.75rem;
-    font: inherit;
-    font-size: 0.9rem;
-    letter-spacing: normal;
-    text-transform: none;
-    color: var(--color-text);
-    background: #fff;
-    border: 1px solid hsla(218, 30%, 40%, 0.25);
-    border-radius: var(--radius-sm);
-  }
+	input,
+	textarea {
+		padding: 0.6rem 0.75rem;
+		font: inherit;
+		font-size: 0.9rem;
+		letter-spacing: normal;
+		text-transform: none;
+		color: var(--color-text);
+		background: #fff;
+		border: 1px solid hsla(218, 30%, 40%, 0.25);
+		border-radius: var(--radius-sm);
+	}
 
-  textarea {
-    resize: vertical;
-  }
+	textarea {
+		resize: vertical;
+	}
 }
 
 .panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  padding: 1.25rem;
-  background: var(--color-surface);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lift);
+	display: flex;
+	flex-direction: column;
+	gap: 0.9rem;
+	padding: 1.25rem;
+	background: var(--color-surface);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-lift);
 
-  h2 {
-    font-family: var(--font-young-serif), serif;
-    font-size: 1.25rem;
-  }
+	h2 {
+		font-family: var(--font-young-serif), serif;
+		font-size: 1.25rem;
+	}
 }
 
 .hint {
-  font-size: 0.85rem;
-  color: var(--color-text-dim);
+	font-size: 0.85rem;
+	color: var(--color-text-dim);
 }
 
 .labelHint {
-  letter-spacing: normal;
-  text-transform: none;
-  opacity: 0.8;
+	letter-spacing: normal;
+	text-transform: none;
+	opacity: 0.8;
 }
 
 .row {
-  display: grid;
-  grid-template-columns: 1fr 9rem;
-  gap: 0.9rem;
+	display: grid;
+	grid-template-columns: 1fr 9rem;
+	gap: 0.9rem;
 
-  @media (max-width: 36rem) {
-    grid-template-columns: 1fr;
-  }
+	@media (max-width: 36rem) {
+		grid-template-columns: 1fr;
+	}
 }
 
 .services {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
 }
 
 .service {
-  gap: 0;
-  padding: 0;
+	gap: 0;
+	padding: 0;
 }
 
 .serviceBar {
-  display: flex;
-  align-items: center;
-  cursor: grab;
-  touch-action: manipulation;
+	display: flex;
+	align-items: center;
+	cursor: grab;
+	touch-action: manipulation;
 
-  &:active {
-    cursor: grabbing;
-  }
+	&:active {
+		cursor: grabbing;
+	}
 }
 
 .grip {
-  display: grid;
-  place-items: center;
-  padding: 0 0.25rem 0 1rem;
-  color: var(--color-text-dim);
+	display: grid;
+	place-items: center;
+	padding: 0 0.25rem 0 1rem;
+	color: var(--color-text-dim);
 }
 
 .toggle {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.1rem 1.25rem 1.1rem 0.5rem;
-  text-align: left;
-  cursor: pointer;
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 1.1rem 1.25rem 1.1rem 0.5rem;
+	text-align: left;
+	cursor: pointer;
 }
 
 .serviceIndex,
 .servicePrice {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-text-dim);
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--color-text-dim);
 }
 
 .serviceTitle {
-  flex: 1;
-  font-family: var(--font-young-serif), serif;
-  font-size: 1.1rem;
+	flex: 1;
+	font-family: var(--font-young-serif), serif;
+	font-size: 1.1rem;
 }
 
 .chevron {
-  color: var(--color-text-dim);
-  transition: transform 0.2s;
+	color: var(--color-text-dim);
+	transition: transform 0.2s;
 
-  &[data-open='true'] {
-    transform: rotate(180deg);
-  }
+	&[data-open='true'] {
+		transform: rotate(180deg);
+	}
 }
 
 .serviceBody {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  padding: 0.25rem 1.25rem 1.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.9rem;
+	padding: 0.25rem 1.25rem 1.25rem;
 }
 
 .dragging {
-  position: relative;
-  z-index: 10;
-  opacity: 0.85;
-  box-shadow: 0 1.25rem 2.5rem hsla(218, 45%, 14%, 0.3);
+	position: relative;
+	z-index: 10;
+	opacity: 0.85;
+	box-shadow: 0 1.25rem 2.5rem hsla(218, 45%, 14%, 0.3);
 }
 
 .tools {
-  display: flex;
-  gap: 0.4rem;
+	display: flex;
+	gap: 0.4rem;
 }
 
 .actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	flex-wrap: wrap;
 }
 
 .primary,
 .outline,
 .danger {
-  padding: 0.6rem 1rem;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
+	// Uppercase mono text has no descenders, so it sits high in the line box; a little less padding below balances it.
+	padding: 0.7rem 1rem 0.5rem;
+	font-family: var(--font-mono);
+	font-size: 0.7rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	border-radius: var(--radius-sm);
+	cursor: pointer;
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
+	&:disabled {
+		opacity: 0.5;
+		cursor: default;
+	}
 }
 
 .primary {
-  color: #fff;
-  background: var(--color-accent-deep);
+	color: #fff;
+	background: var(--color-accent-deep);
 
-  &:disabled {
-    cursor: progress;
-  }
+	&:disabled {
+		cursor: progress;
+	}
 }
 
 .outline {
-  border: 1px solid hsla(218, 30%, 40%, 0.35);
+	border: 1px solid hsla(218, 30%, 40%, 0.35);
 }
 
 .danger {
-  color: #b3261e;
-  border: 1px solid #b3261e;
+	color: #b3261e;
+	border: 1px solid #b3261e;
 }
 
 .ok,
 .error {
-  font-size: 0.85rem;
+	font-size: 0.85rem;
 }
 
 .ok {
-  color: #1b6e3c;
+	color: #1b6e3c;
 }
 
 .error {
-  color: #b3261e;
+	color: #b3261e;
 }
