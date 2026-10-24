@@ -35,6 +35,7 @@
 	font-size: 1.05rem;
 	color: color-mix(in srgb, var(--color-text) 75%, transparent);
 	text-wrap: pretty;
+	white-space: pre-line;
 }
 
 .details {

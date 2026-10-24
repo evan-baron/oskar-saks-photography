@@ -139,6 +139,7 @@
 		line-height: 1.6;
 		color: color-mix(in srgb, var(--color-text) 72%, transparent);
 		text-wrap: pretty;
+		white-space: pre-line;
 	}
 }
 

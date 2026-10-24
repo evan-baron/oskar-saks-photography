@@ -187,6 +187,7 @@
 	line-height: 1.5;
 	color: color-mix(in srgb, var(--color-text) 85%, transparent);
 	text-wrap: pretty;
+	white-space: pre-line;
 	opacity: 0;
 	animation: fade 1s ease 1.5s forwards;
 
