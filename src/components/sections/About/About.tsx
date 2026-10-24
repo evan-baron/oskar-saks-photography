@@ -13,7 +13,6 @@ type AboutProps = {
 
 export default async function About({ onAboutPage = false }: AboutProps) {
 	const content = await getAboutContent();
-	console.log('About content:', content);
 	const titleId = onAboutPage ? 'about-page-title' : 'about-title';
 	return (
 		// Always follows the "Hi, I'm Oskar" introduction, which has the "about" id and the "About" eyebrow.
